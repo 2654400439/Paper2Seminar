@@ -24,7 +24,10 @@ One-click AI slide generators solve the blank-page problem, but often create a m
 - decorative visuals replace evidence, while important methods and experiments quietly disappear;
 - the presenter receives a finished-looking file they cannot confidently explain or revise.
 
-In a research group, those fingerprints are visible immediately. The problem is not simply that AI was used. The problem is that the deck carries the familiar “one-click look”: too generic, too ornamental, too shallow, or impossible to correct. It feels less like a student’s seminar deck and more like an AI presentation demo.
+> [!CAUTION]
+> **An advisor can usually spot these “one-click” fingerprints at a glance.**
+
+The problem is not simply that AI was used. The problem is that the deck carries the familiar “one-click look”: too generic, too ornamental, too shallow, or impossible to correct. It feels less like a student’s seminar deck and more like an AI presentation demo.
 
 **Paper2Seminar is a dedicated one-request generator for academic-paper presentations.** Give it a paper PDF and one instruction; it reads the paper, budgets the deck, plans every slide, routes the visuals, assembles an editable PPTX, and runs QA.
 
