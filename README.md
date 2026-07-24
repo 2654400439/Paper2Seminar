@@ -1,12 +1,12 @@
 # Paper2Seminar
 
-简体中文 | [English](README.en.md)
+<p align="center"><strong>简体中文</strong> · <a href="README.en.md">English</a></p>
 
 <p align="center"><img src="docs/assets/hero.png" width="920" alt="Paper2Seminar 工作流插图"></p>
 
-
 <p align="center"><strong>一篇论文，一句话，生成一套不像“一键生成”的组会 PPT。</strong></p>
 <p align="center">专用于学术论文汇报的一键生成工作流：可编辑、够完整，也更像真实组会里的 PPT。</p>
+<p align="center"><sub>📖 全文理解 &nbsp;→&nbsp; 🧭 结构规划 &nbsp;→&nbsp; 🖼️ 视觉路由 &nbsp;→&nbsp; 🛠️ 可编辑组装 &nbsp;→&nbsp; ✅ 多阶段 QA</sub></p>
 
 <p align="center">
   <img alt="Agent Skill" src="https://img.shields.io/badge/Agent%20Skill-compatible-194A96">
@@ -15,7 +15,7 @@
   <img alt="MIT License" src="https://img.shields.io/badge/code%20license-MIT-555555">
 </p>
 
-## 为什么要做这个项目
+## 🎓 为什么要做这个项目
 
 大模型已经能一键生成一套“看起来很完整”的 PPT，但对科研汇报来说，这种完整往往只是表面的：
 
@@ -36,7 +36,7 @@
 
 > **一键，是交互方式；不是“一键生成感”的审美。**
 
-## 什么叫“不像一键生成”
+## 🔍 什么叫“不像一键生成”
 
 | 常见一键生成 PPT | Paper2Seminar |
 |---|---|
@@ -50,7 +50,7 @@
 
 这里的“有人味”不是故意制造粗糙和瑕疵，而是遵循真实组会里熟悉的表达方式：信息密度合理、设计克制、图表来自论文、对象保持可编辑，整套叙事也能对应论文真实结构。
 
-## 看看实际产出
+## 🖼️ 看看实际产出
 
 下面全部来自工作流生成的完整 PPT，不是为了 README 单独手工制作的效果图。
 
@@ -77,7 +77,7 @@
   </tr>
 </table>
 
-### 完整大纲总览
+### 🗺️ 完整大纲总览
 
 <details>
   <summary><strong>WebCloak — 32 页完整讨论班 PPT</strong></summary>
@@ -96,7 +96,7 @@
 
 两份 PPTX 均通过 OpenXML 校验，OfficeCLI 未报告结构问题。验证信息及论文第三方内容的权利边界见 [样例说明](examples/README.md)。
 
-## 这种效果是怎样被控制出来的
+## 🧭 这种效果是怎样被控制出来的
 
 不存在一句万能的“生成得像人做的”提示词。这个项目依靠一条受约束的技术路线获得稳定结果：
 
@@ -112,14 +112,14 @@ paper.pdf
   -> 结构 + 内容 + 视觉 QA
 ```
 
-### 内容控制
+### 🧠 内容控制
 
 - 在规划 PPT 前完整阅读论文，而不是只读取摘要和结论。
 - 将核心方法小节、研究问题和主要实验逐一映射到幻灯片。
 - 先写完整标题序列，再开始生成图片和修改 PPT。
 - 区分论文原始结论与汇报者分析，并保留关键数值的准确语境。
 
-### 视觉控制
+### 🎨 视觉控制
 
 - 方法和实验结果优先使用论文原图。
 - 只有存在准确、可比较数据时才使用 Matplotlib 重绘。
@@ -127,20 +127,20 @@ paper.pdf
 - 生图和外部图片只服务于概念表达，不能冒充实验或系统结构证据。
 - 所有裁剪图、综合图和生成图必须先独立审核，再进入 PPT。
 
-### 格式控制
+### 🧱 格式控制
 
 - 从完整的 16:9 讨论班模板组装，而不是把每页绘制成不可编辑位图。
 - 正文、强调、图片、页序、讲稿备注和替代文本继续保留为可编辑 PPTX 对象。
 - 默认采用克制、固定的正文布局，让页面像科研汇报，而不是营销网站。
 
-### 质量控制
+### 🛡️ 质量控制
 
 - 在生成资产前、组装前和最终审批后分别校验 `deck-plan.json`。
 - 每次运行记录工具能力、输入输出路径、hash 和审批状态。
 - PowerPoint 页面渲染是可选检查，不阻塞核心 PPTX 组装。
 - 脚本成功只是必要条件，不能代替论文语义和最终视觉审核。
 
-## 最终会得到什么
+## 📦 最终会得到什么
 
 - 一份完整的中文讨论班 PPT，并保留必要的英文技术术语。
 - 一份由 OfficeCLI 从固定模板组装的可编辑 `.pptx`。
@@ -151,7 +151,7 @@ paper.pdf
 
 当前工作流最适合 12–16 页以上的系统、安全、网络和测量类论文。除非用户明确要求短讲，完整论文通常会得到 26–32 页 PPT。
 
-## 快速开始
+## 🚀 快速开始
 
 将仓库作为 agent 的工作目录打开，提供论文 PDF，然后提出类似请求：
 
@@ -167,7 +167,7 @@ Codex 可以显式调用：
 
 Codex 和 OpenCode 可通过 `.agents/skills/paper-ppt-orchestrator` 自动发现，Claude Code 可通过 `.claude/skills/paper-ppt-orchestrator` 自动发现。
 
-## 环境要求
+## 🧰 环境要求
 
 核心流程需要：
 
@@ -200,7 +200,7 @@ python skills/paper-ppt-orchestrator/scripts/paper_ppt.py extract-assets paper.p
 python skills/paper-ppt-orchestrator/scripts/paper_ppt.py preflight -o runs/demo/capabilities.json --imagegen unavailable --web-search unavailable
 ```
 
-## 框架安装
+## 🔌 框架安装
 
 独立安装时，将 `skills/paper-ppt-orchestrator/` 整体复制到对应框架目录：
 
@@ -214,7 +214,7 @@ python skills/paper-ppt-orchestrator/scripts/paper_ppt.py preflight -o runs/demo
 
 完整边界见 [框架与平台兼容性说明](docs/compatibility.md)。
 
-## 仓库目录
+## 🗂️ 仓库目录
 
 ```text
 .
@@ -235,7 +235,7 @@ python skills/paper-ppt-orchestrator/scripts/paper_ppt.py preflight -o runs/demo
 
 `skills/paper-ppt-orchestrator/` 是唯一的规范实现；两个隐藏目录只是仓库内的自动发现入口。
 
-## 当前边界
+## ⚠️ 当前边界
 
 - 项目提供可靠的首轮交付物，不承诺无人监督的最终真理。
 - 语义准确性仍取决于模型是否正确理解论文以及最终人工审核。
@@ -243,7 +243,7 @@ python skills/paper-ppt-orchestrator/scripts/paper_ppt.py preflight -o runs/demo
 - 随附模板保留现有国科大视觉标识和默认汇报人/指导老师姓名，需要时可在幻灯片母版、封面和结束页中替换。
 - 论文 PDF 和 `runs/` 不进入版本控制；只有经过验证并附带第三方内容说明的展示样例保存在 `examples/` 中。
 
-## 开发验证
+## ✅ 开发验证
 
 ```text
 python -m pip install -r requirements.txt
@@ -255,7 +255,7 @@ python skills/paper-ppt-orchestrator/scripts/validate_deck_plan.py examples/deck
 
 修改 `deck-plan.json` 契约、builder 或模板前，请先阅读 [架构说明](docs/architecture.md) 和 [贡献指南](CONTRIBUTING.md)。
 
-## 许可证
+## 📄 许可证
 
 仓库原创代码和文档采用 MIT License。第三方工具遵循各自许可证。随附模板中的国科大名称和标识不因本仓库采用 MIT License 而获得额外授权，不适用时请自行替换。具体边界见 [THIRD_PARTY.md](THIRD_PARTY.md)。
 
