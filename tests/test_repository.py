@@ -61,6 +61,35 @@ class RepositoryTests(unittest.TestCase):
             with self.subTest(loader=loader):
                 self.assertIn(expected, loader.read_text(encoding="utf-8"))
 
+    def test_curated_examples_are_complete(self) -> None:
+        decks = {
+            ROOT / "examples" / "decks" / "webcloak-seminar.pptx": 32,
+            ROOT / "examples" / "decks" / "beyond-rtt-seminar.pptx": 30,
+        }
+        for deck, expected_slides in decks.items():
+            with self.subTest(deck=deck):
+                self.assertTrue(deck.is_file())
+                with zipfile.ZipFile(deck) as archive:
+                    slides = [
+                        name
+                        for name in archive.namelist()
+                        if re.fullmatch(r"ppt/slides/slide\d+\.xml", name)
+                    ]
+                self.assertEqual(len(slides), expected_slides)
+
+        gallery = ROOT / "examples" / "gallery"
+        expected_images = {
+            "webcloak-paper-evidence.png",
+            "webcloak-method.png",
+            "beyond-rtt-tikz.png",
+            "beyond-rtt-results.png",
+            "webcloak-overview.png",
+            "beyond-rtt-overview.png",
+        }
+        self.assertEqual({path.name for path in gallery.glob("*.png")}, expected_images)
+        for name in expected_images:
+            self.assertGreater((gallery / name).stat().st_size, 10_000)
+
 
 if __name__ == "__main__":
     unittest.main()

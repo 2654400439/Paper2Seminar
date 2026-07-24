@@ -23,6 +23,7 @@ qa/
 
 # Keep the distributable template tracked
 !skills/paper-ppt-orchestrator/assets/seminar-template.pptx
+!examples/decks/*.pptx
 
 # Local editor and OS files
 .DS_Store

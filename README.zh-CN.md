@@ -47,6 +47,52 @@
 
 这里的“有人味”不是故意制造粗糙和瑕疵，而是遵循真实组会里熟悉的表达方式：信息密度合理、设计克制、图表来自论文、对象保持可编辑，整套叙事也能对应论文真实结构。
 
+## 看看实际产出
+
+下面全部来自工作流生成的完整 PPT，不是为了 README 单独手工制作的效果图。
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <a href="examples/gallery/webcloak-paper-evidence.png"><img src="examples/gallery/webcloak-paper-evidence.png" alt="WebCloak 论文证据页面"></a><br>
+      <sub><strong>论文证据</strong> — 保留原始研究内容和必要语境</sub>
+    </td>
+    <td width="50%" align="center">
+      <a href="examples/gallery/webcloak-method.png"><img src="examples/gallery/webcloak-method.png" alt="WebCloak 方法机制页面"></a><br>
+      <sub><strong>方法机制</strong> — 围绕论文图表进行克制解释</sub>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <a href="examples/gallery/beyond-rtt-tikz.png"><img src="examples/gallery/beyond-rtt-tikz.png" alt="Beyond RTT TikZ 综合图页面"></a><br>
+      <sub><strong>TikZ 综合图</strong> — 将多个论文小节整理成适合讲解的结构</sub>
+    </td>
+    <td width="50%" align="center">
+      <a href="examples/gallery/beyond-rtt-results.png"><img src="examples/gallery/beyond-rtt-results.png" alt="Beyond RTT 数据重绘页面"></a><br>
+      <sub><strong>数据重绘</strong> — 使用准确可比数值生成可编辑学术图表</sub>
+    </td>
+  </tr>
+</table>
+
+### 完整大纲总览
+
+<details>
+  <summary><strong>WebCloak — 32 页完整讨论班 PPT</strong></summary>
+  <p align="center"><a href="examples/gallery/webcloak-overview.png"><img src="examples/gallery/webcloak-overview.png" width="100%" alt="WebCloak 32 页 PPT 总览"></a></p>
+</details>
+
+<details>
+  <summary><strong>Beyond RTT — 30 页完整讨论班 PPT</strong></summary>
+  <p align="center"><a href="examples/gallery/beyond-rtt-overview.png"><img src="examples/gallery/beyond-rtt-overview.png" width="100%" alt="Beyond RTT 30 页 PPT 总览"></a></p>
+</details>
+
+| 可编辑样例 | 页数 | 下载 |
+|---|---:|---|
+| WebCloak · IEEE S&P 2026 | 32 | [PPTX](examples/decks/webcloak-seminar.pptx) |
+| Beyond RTT · NDSS 2026 | 30 | [PPTX](examples/decks/beyond-rtt-seminar.pptx) |
+
+两份 PPTX 均通过 OpenXML 校验，OfficeCLI 未报告结构问题。验证信息及论文第三方内容的权利边界见 [样例说明](examples/README.md)。
+
 ## 这种效果是怎样被控制出来的
 
 不存在一句万能的“生成得像人做的”提示词。这个项目依靠一条受约束的技术路线获得稳定结果：
@@ -167,6 +213,8 @@ python skills/paper-ppt-orchestrator/scripts/paper_ppt.py preflight -o runs/demo
 |   |-- references/
 |   `-- scripts/
 |-- examples/
+|   |-- decks/                                 # 精选的可编辑样例 PPTX
+|   `-- gallery/                               # 精选页面与完整大纲总览
 |-- tests/
 `-- docs/
 ```
@@ -179,7 +227,7 @@ python skills/paper-ppt-orchestrator/scripts/paper_ppt.py preflight -o runs/demo
 - 语义准确性仍取决于模型是否正确理解论文以及最终人工审核。
 - 当前正文布局有意保持固定和克制，而不是追求无限主题和版式变化。
 - 随附模板保留现有国科大视觉标识和默认汇报人/指导老师姓名，需要时可在幻灯片母版、封面和结束页中替换。
-- 论文 PDF、出版方图片、生成的 `runs/` 和最终 PPT 不进入版本控制。
+- 论文 PDF 和 `runs/` 不进入版本控制；只有经过验证并附带第三方内容说明的展示样例保存在 `examples/` 中。
 
 ## 开发验证
 
