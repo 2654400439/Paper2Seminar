@@ -1,0 +1,2 @@
+-r requirements.txt
+-r skills/paper-ppt-orchestrator/requirements-doclayout.txt

@@ -61,6 +61,18 @@ class RepositoryTests(unittest.TestCase):
             with self.subTest(loader=loader):
                 self.assertIn(expected, loader.read_text(encoding="utf-8"))
 
+    def test_doclayout_backend_is_self_contained_without_bundled_weights(self) -> None:
+        required = (
+            SKILL_ROOT / "scripts" / "extract_paper_assets.py",
+            SKILL_ROOT / "references" / "figure-extraction.md",
+            SKILL_ROOT / "requirements-doclayout.txt",
+        )
+        self.assertTrue(all(path.is_file() for path in required))
+        requirements = required[2].read_text(encoding="utf-8")
+        self.assertIn("doclayout-yolo==0.0.4", requirements)
+        self.assertIn("torchvision==0.23.0", requirements)
+        self.assertEqual(list(SKILL_ROOT.rglob("*.pt")), [])
+
     def test_curated_examples_are_complete(self) -> None:
         decks = {
             ROOT / "examples" / "decks" / "webcloak-seminar.pptx": 32,

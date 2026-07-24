@@ -9,6 +9,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from extract_paper_assets import default_model_path, download_model
+
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 
@@ -113,6 +115,32 @@ def main() -> int:
     authors.add_argument("--title", default="")
     authors.add_argument("--dpi", type=int, default=260)
     authors.add_argument("--bbox", help="manual x0,y0,x1,y1 override in PDF points")
+
+    extract = subparsers.add_parser(
+        "extract-assets", help="extract paper figures and tables with DocLayout or CaptionCrop"
+    )
+    extract.add_argument("pdf", type=Path)
+    extract.add_argument("-o", "--output", type=Path, required=True)
+    extract.add_argument("--backend", choices=("doclayout", "captioncrop"), default="doclayout")
+    extract.add_argument("--clean", action="store_true")
+    extract.add_argument("--model", type=Path)
+    extract.add_argument("--cache-dir", type=Path)
+    extract.add_argument("--allow-unverified-model", action="store_true")
+    extract.add_argument("--confidence", type=float, default=0.18)
+    extract.add_argument("--image-size", type=int, default=1024)
+    extract.add_argument("--detection-dpi", type=int, default=144)
+    extract.add_argument("--crop-dpi", type=int, default=300)
+    extract.add_argument("--padding-points", type=float, default=5.0)
+    extract.add_argument("--dedupe-iou", type=float, default=0.75)
+    extract.add_argument("--device", default="cpu")
+    extract.add_argument("--captioncrop-command", type=Path)
+    extract.add_argument("--captioncrop-dpi", type=int, default=240)
+
+    model = subparsers.add_parser(
+        "download-layout-model", help="download and verify the pinned DocLayout model"
+    )
+    model.add_argument("-o", "--output", type=Path)
+    model.add_argument("--force", action="store_true")
 
     build = subparsers.add_parser("build", help="build PPTX from a prepared plan")
     build.add_argument("plan", type=Path)
@@ -230,6 +258,47 @@ def main() -> int:
         if args.bbox:
             command += ["--bbox", args.bbox]
         run(command)
+    elif args.command == "extract-assets":
+        command = [
+            sys.executable,
+            str(SCRIPT_DIR / "extract_paper_assets.py"),
+            str(args.pdf.resolve()),
+            "-o",
+            str(args.output.resolve()),
+            "--backend",
+            args.backend,
+        ]
+        if args.clean:
+            command.append("--clean")
+        if args.model:
+            command += ["--model", str(args.model.resolve())]
+        if args.cache_dir:
+            command += ["--cache-dir", str(args.cache_dir.resolve())]
+        if args.allow_unverified_model:
+            command.append("--allow-unverified-model")
+        command += [
+            "--confidence", str(args.confidence),
+            "--image-size", str(args.image_size),
+            "--detection-dpi", str(args.detection_dpi),
+            "--crop-dpi", str(args.crop_dpi),
+            "--padding-points", str(args.padding_points),
+            "--dedupe-iou", str(args.dedupe_iou),
+            "--device", args.device,
+            "--captioncrop-dpi", str(args.captioncrop_dpi),
+        ]
+        if args.captioncrop_command:
+            command += ["--captioncrop-command", str(args.captioncrop_command.resolve())]
+        run(command)
+    elif args.command == "download-layout-model":
+        output = (args.output or default_model_path()).expanduser().resolve()
+        try:
+            result = download_model(output, force=args.force)
+        except RuntimeError as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            return 1
+        action = "Downloaded" if result["downloaded"] else "Verified existing"
+        print(f"{action} DocLayout model: {result['path']}")
+        print(f"SHA-256: {result['sha256']}")
     elif args.command == "build":
         command = [sys.executable, str(SCRIPT_DIR / "build_ppt.py"), str(args.plan.resolve())]
         if args.output:

@@ -8,6 +8,8 @@ __pycache__/
 htmlcov/
 .venv/
 venv/
+.yolo-config/
+doclayout_yolo_ft.pt
 
 # Generated paper workflow artifacts
 runs/

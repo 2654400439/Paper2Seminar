@@ -60,13 +60,15 @@ When practical, distinguish:
 
 Never present the second type as the first.
 
-Prefer CaptionCrop from its repository or installed CLI. If it is unavailable, render only the required PDF pages, crop selected regions with `scripts/crop_image_region.py`, record source page and bounding box in the run manifest, and create a contact sheet with `scripts/make_contact_sheet.py`.
+Use the bundled DocLayout backend by default. Read `figure-extraction.md`, verify that preflight reports the model and inference modules as available, and run:
 
 ```powershell
-python caption_crop.py PAPER.pdf -o OUTPUT --dpi 240 --clean --contact-sheet
+python scripts/paper_ppt.py extract-assets PAPER.pdf -o RUN/assets/paper/extracted --clean
 ```
 
-Parse `metadata.json`, inspect `contact_sheet.png`, and assign review status to every candidate asset. Keep rejected crops in metadata; do not select them for slides.
+Use `--backend captioncrop` for the retained lightweight route. If neither automatic backend is available, render only required PDF pages, crop selected regions with `scripts/crop_image_region.py`, record source page and bounding box in the run manifest, and create a contact sheet with `scripts/make_contact_sheet.py`.
+
+Parse the selected backend's native manifest/metadata, inspect its contact sheet, and assign review status to every candidate asset. Keep rejected crops recorded; do not select them for slides.
 
 Crop the paper's author and affiliation band for the paper-information slide:
 

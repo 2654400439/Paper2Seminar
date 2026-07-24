@@ -68,7 +68,9 @@ Failure returns to planning, not slide assembly.
 ### Paper assets
 
 - Author/affiliation crop contains the full names and institutions but excludes the paper title and Abstract/body text.
-- Figure extraction metadata and a reviewed contact sheet exist, whether produced by CaptionCrop or the documented manual-crop fallback.
+- Figure extraction metadata and a reviewed contact sheet exist, whether produced by the default DocLayout backend, CaptionCrop compatibility mode, or the documented manual-crop fallback.
+- The extraction backend, parameters, PDF hash, and model hash when applicable are recorded.
+- Duplicate same-class detections and `Algorithm N` false tables are absent from selected assets.
 - Every selected crop is reviewed.
 - Crop contains the intended figure/table and no unrelated paragraph or page header.
 - Axis labels, legends, and table text remain readable at slide size.

@@ -17,7 +17,9 @@ The core Python utilities and browser renderer support Windows, macOS, and Linux
 
 TikZ slides require XeLaTeX and `pdftoppm`. The bundled PowerPoint COM exporter is Windows-only and optional; use it only for final-size rendering when the host supports desktop PowerPoint automation. Core assembly and structural validation do not require Microsoft PowerPoint.
 
-CaptionCrop is recommended but not bundled. When it is unavailable, the skill requires page rendering, explicit manual bounding boxes, provenance recording, and contact-sheet review instead of silently skipping figure QA.
+DocLayout-YOLO is the default figure/table detector. Its Python runtime and pinned model are installed/downloaded separately, and preflight reports them independently. CPU inference is cross-platform; accelerator selection remains explicit. The model is loaded once per extraction command, while final crops are rendered from PDF coordinates at high DPI.
+
+CaptionCrop remains an optional external lightweight backend selected with `--backend captioncrop`. When neither backend is available, the skill requires page rendering, explicit manual bounding boxes, provenance recording, and contact-sheet review instead of silently skipping figure QA.
 
 ## Tool-name adaptation
 

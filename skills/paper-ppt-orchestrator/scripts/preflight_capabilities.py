@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from render_one_page_html import browser_candidates, browser_version
+from extract_paper_assets import MODEL_SHA256, default_model_path, sha256_file
 
 
 DECLARED_STATES = ("available", "unavailable", "unknown")
@@ -60,6 +61,18 @@ def executable_record(
 
 def module_record(name: str) -> dict[str, Any]:
     return {"status": "available" if importlib.util.find_spec(name) else "unavailable"}
+
+
+def model_record() -> dict[str, Any]:
+    path = default_model_path().expanduser()
+    if not path.is_file():
+        return {"status": "unavailable", "path": str(path), "sha256": None}
+    digest = sha256_file(path)
+    return {
+        "status": "available" if digest == MODEL_SHA256 else "hash_mismatch",
+        "path": str(path.resolve()),
+        "sha256": digest,
+    }
 
 
 def find_powerpoint() -> Path | None:
@@ -121,6 +134,21 @@ def build_report(imagegen: str, web_search: str) -> dict[str, Any]:
         warnings.append("PowerPoint was not found; use LibreOffice or OfficeCLI for slide rendering.")
     if imagegen == "unknown" or web_search == "unknown":
         warnings.append("Agent-only media capabilities remain unknown; do not retry blindly before declaring them.")
+    layout_model = model_record()
+    doclayout_modules = {
+        name: module_record(name)
+        for name in ("doclayout_yolo", "torch", "torchvision", "cv2", "numpy")
+    }
+    if layout_model["status"] == "hash_mismatch":
+        warnings.append("The cached DocLayout model failed SHA-256 verification; do not load it.")
+    doclayout_available = layout_model["status"] == "available" and all(
+        item["status"] == "available" for item in doclayout_modules.values()
+    )
+    if not doclayout_available:
+        warnings.append(
+            "Default DocLayout extraction is unavailable; install requirements-doclayout.txt "
+            "and download the pinned model, or select an explicit fallback."
+        )
 
     return {
         "schema_version": "0.1",
@@ -156,9 +184,22 @@ def build_report(imagegen: str, web_search: str) -> dict[str, Any]:
                 "path": str(powerpoint) if powerpoint else None,
                 "runtime_access": "not_probed",
             },
+            "captioncrop": executable_record(("caption-crop", "captioncrop", "caption_crop.py")),
         },
         "python_modules": {
             name: module_record(name) for name in ("fitz", "PIL", "matplotlib", "jsonschema")
+        },
+        "paper_asset_extraction": {
+            "default_backend": "doclayout",
+            "doclayout": {
+                "model": layout_model,
+                "modules": doclayout_modules,
+                "status": "available" if doclayout_available else "unavailable",
+            },
+            "captioncrop": {
+                "status": "optional_external_tool",
+                "selection": "use --backend captioncrop and --captioncrop-command when it is not on PATH",
+            },
         },
         "warnings": warnings,
     }

@@ -30,9 +30,125 @@ from render_one_page_html import (  # noqa: E402
 )
 from validate_deck_plan import Reporter, validate  # noqa: E402
 from update_qa_status import QAError, apply_action  # noqa: E402
+from extract_paper_assets import (  # noqa: E402
+    Detection,
+    ExtractionConfig,
+    ExtractionError,
+    build_parser as build_extraction_parser,
+    deduplicate,
+    extract_pdf,
+    intersection_over_union,
+    run_captioncrop,
+    verify_model,
+)
+
+
+class FakeLayoutPredictor:
+    def __init__(self, pages: list[list[Detection]]) -> None:
+        self.pages = pages
+        self.calls = 0
+
+    def predict(self, _image: Image.Image) -> list[Detection]:
+        result = self.pages[self.calls]
+        self.calls += 1
+        return result
 
 
 class WorkflowTests(unittest.TestCase):
+    def test_doclayout_is_the_default_extraction_backend(self) -> None:
+        args = build_extraction_parser().parse_args(["paper.pdf", "-o", "assets"])
+        self.assertEqual(args.backend, "doclayout")
+        self.assertEqual(args.confidence, 0.18)
+        self.assertEqual(args.detection_dpi, 144)
+        self.assertEqual(args.crop_dpi, 300)
+
+    def test_detection_deduplication_is_same_class_and_confidence_ordered(self) -> None:
+        figure = Detection("figure", 0.95, (10, 10, 110, 110))
+        duplicate = Detection("figure", 0.70, (12, 12, 108, 108))
+        overlapping_table = Detection("table", 0.80, (10, 10, 110, 110))
+        self.assertGreater(intersection_over_union(figure.bbox_pixels, duplicate.bbox_pixels), 0.75)
+        retained = deduplicate([duplicate, overlapping_table, figure], 0.75)
+        self.assertEqual({(item.kind, item.confidence) for item in retained}, {("figure", 0.95), ("table", 0.80)})
+
+    def test_doclayout_extraction_writes_complete_portable_qa_package(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            pdf = root / "paper.pdf"
+            output = root / "assets"
+            document = fitz.open()
+            first = document.new_page(width=612, height=792)
+            first.insert_text((58, 326), "Algorithm 1 Example procedure", fontsize=11)
+            second = document.new_page(width=612, height=792)
+            second.insert_text((58, 126), "Table I Results", fontsize=11)
+            document.save(pdf)
+            document.close()
+
+            predictor = FakeLayoutPredictor(
+                [
+                    [
+                        Detection("figure", 0.95, (100, 100, 300, 250)),
+                        Detection("figure", 0.70, (102, 102, 298, 248)),
+                        Detection("figure", 0.88, (320, 100, 550, 250)),
+                        Detection("table", 0.92, (50, 300, 300, 420)),
+                    ],
+                    [Detection("table", 0.90, (50, 100, 560, 300))],
+                ]
+            )
+            config = ExtractionConfig(detection_dpi=72, crop_dpi=144)
+            summary = extract_pdf(pdf, output, predictor, config)
+
+            self.assertEqual(predictor.calls, 2)
+            self.assertEqual(summary["figures"], 2)
+            self.assertEqual(summary["tables"], 1)
+            self.assertEqual(summary["total"], 3)
+            self.assertEqual(summary["deduplicated_detections"], 1)
+            self.assertEqual(summary["rejected_detections"][0]["reason"], "algorithm_block")
+            manifest = json.loads((output / "manifest.json").read_text(encoding="utf-8"))
+            self.assertEqual([item["id"] for item in manifest], ["figure_01", "figure_02", "table_01"])
+            self.assertTrue(all(item["review_status"] == "unreviewed" for item in manifest))
+            self.assertTrue(all(not Path(item["file"]).is_absolute() for item in manifest))
+            self.assertTrue(all("absolute_file" not in item for item in manifest))
+            self.assertEqual(manifest[0]["bbox_pdf_points"], [95.0, 95.0, 305.0, 255.0])
+            for item in manifest:
+                crop = output / item["file"]
+                self.assertTrue(crop.is_file())
+                with Image.open(crop) as image:
+                    self.assertEqual(image.size, (item["width"], item["height"]))
+            self.assertTrue((output / "manifest.csv").is_file())
+            self.assertTrue((output / "contact_sheet.jpg").is_file())
+            self.assertEqual(len(list((output / "annotated_pages").glob("*.jpg"))), 2)
+
+            with self.assertRaisesRegex(ExtractionError, "pass --clean"):
+                extract_pdf(pdf, output, predictor, config)
+
+    def test_unverified_model_and_captioncrop_compatibility_are_explicit(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            untrusted = root / "model.pt"
+            untrusted.write_bytes(b"not a model")
+            with self.assertRaisesRegex(ExtractionError, "SHA-256 mismatch"):
+                verify_model(untrusted)
+            self.assertEqual(len(verify_model(untrusted, allow_unverified=True)), 64)
+
+            capture = root / "args.json"
+            script = root / "caption_crop.py"
+            script.write_text(
+                "import json, pathlib, sys\n"
+                f"pathlib.Path({str(capture)!r}).write_text(json.dumps(sys.argv[1:]), encoding='utf-8')\n",
+                encoding="utf-8",
+            )
+            run_captioncrop(
+                root / "paper.pdf",
+                root / "output",
+                command=script,
+                dpi=260,
+                clean=True,
+            )
+            arguments = json.loads(capture.read_text(encoding="utf-8"))
+            self.assertIn("--contact-sheet", arguments)
+            self.assertIn("--clean", arguments)
+            self.assertEqual(arguments[arguments.index("--dpi") + 1], "260")
+
     def test_qa_transitions_are_explicit_atomic_and_audited(self) -> None:
         source_plan = json.loads(
             (ROOT / "examples" / "deck-plan.example.json").read_text(encoding="utf-8")

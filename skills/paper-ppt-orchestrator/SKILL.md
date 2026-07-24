@@ -27,14 +27,15 @@ Use a clean run directory. Never derive a new deck from a previous generated dec
 3. Read `references/content-design.md` while creating the title sequence and slide copy.
 4. Read `references/deck-sizing.md` before choosing a slide count. This is mandatory for every full-paper run.
 5. Read `references/one-page-template.md` before producing slide 3.
-6. Read `references/visual-selection.md` before assigning or generating visuals.
-7. Read `references/tikz-layout.md` only when at least one slide uses TikZ.
-8. Read `references/data-viz.schema.json` when at least one slide uses `data_redraw`.
-9. Read `references/qa-gates.md` before assembly and final delivery.
-10. Use `references/deck-plan.schema.json` as the machine-readable plan contract.
-11. Read `references/environment-compatibility.md` when running preflight, browser rendering, PowerPoint export, or PowerShell scripts.
+6. Read `references/figure-extraction.md` before extracting paper figures or tables.
+7. Read `references/visual-selection.md` before assigning or generating visuals.
+8. Read `references/tikz-layout.md` only when at least one slide uses TikZ.
+9. Read `references/data-viz.schema.json` when at least one slide uses `data_redraw`.
+10. Read `references/qa-gates.md` before assembly and final delivery.
+11. Use `references/deck-plan.schema.json` as the machine-readable plan contract.
+12. Read `references/environment-compatibility.md` when running preflight, browser rendering, PowerPoint export, or PowerShell scripts.
 
-If the environment provides separate CaptionCrop, TikZ, Office/PPTX, or image-generation skills, load the relevant skill before invoking that capability.
+If the environment provides separate CaptionCrop, TikZ, Office/PPTX, or image-generation skills, load the relevant skill before invoking that capability. The bundled DocLayout extractor does not require a separate skill.
 
 ## Mandatory workflow
 
@@ -58,7 +59,7 @@ python scripts/paper_ppt.py preflight -o RUN/capabilities.json --imagegen availa
 - Record paper metadata, section summaries, contributions, limitations, candidate slide claims, and the small set of exact values that may need data redraw.
 - Create the mandatory subsection coverage matrix defined in `references/deck-sizing.md`. Do not plan slides until every core method subsection, research question, and primary experiment has a coverage status.
 - Write each contribution as rich-text runs that occupy about two lines. Keep the statement regular-weight and mark only key phrases `bold`; do not use accent color.
-- Prefer CaptionCrop for slide-ready figure extraction with metadata and a contact sheet. If it is unavailable, render the required PDF pages, crop figures with `scripts/crop_image_region.py`, record page and bounding-box provenance, and build an equivalent contact sheet with `scripts/make_contact_sheet.py`.
+- Use the bundled DocLayout backend by default for slide-ready figure/table extraction, metadata, annotated pages, and a contact sheet. Keep CaptionCrop as the explicit lightweight alternative with `--backend captioncrop`; if neither automatic route is available, render only required pages and make provenance-recorded manual crops.
 - Crop the author and affiliation band from below the paper title with `paper_ppt.py crop-authors`; keep the title and abstract outside the crop. Use `--bbox` when automatic anchors are unreliable.
 - Review the contact sheet. Mark each crop `approved`, `rejected`, or `needs_adjustment`; detection alone is not approval.
 

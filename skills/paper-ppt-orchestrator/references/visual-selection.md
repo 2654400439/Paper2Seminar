@@ -23,7 +23,7 @@ Use for:
 
 Requirements:
 
-- Asset must exist in CaptionCrop metadata or have an explicit manual crop record.
+- Asset must exist in the selected extractor's manifest/metadata or have an explicit manual crop record.
 - Review the crop at the final slide size.
 - Preserve or restate the source caption.
 - Use `contain`; never distort.

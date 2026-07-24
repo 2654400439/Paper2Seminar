@@ -1,245 +1,259 @@
 # Paper2Seminar
 
-[简体中文](README.zh-CN.md) | English
+简体中文 | [English](README.en.md)
 
-<p align="center"><img src="docs/assets/hero.png" width="920" alt="Paper2Seminar workflow illustration"></p>
+<p align="center"><img src="docs/assets/hero.png" width="920" alt="Paper2Seminar 工作流插图"></p>
 
-<p align="center"><strong>One paper. One prompt. A seminar deck that doesn’t look one-click.</strong></p>
-<p align="center">One-click academic-paper PPT generation with editable output and the visual restraint of a real research seminar.</p>
+
+<p align="center"><strong>一篇论文，一句话，生成一套不像“一键生成”的组会 PPT。</strong></p>
+<p align="center">专用于学术论文汇报的一键生成工作流：可编辑、够完整，也更像真实组会里的 PPT。</p>
 
 <p align="center">
   <img alt="Agent Skill" src="https://img.shields.io/badge/Agent%20Skill-compatible-194A96">
   <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB">
-  <img alt="Output PPTX" src="https://img.shields.io/badge/output-editable%20PPTX-2F855A">
-  <img alt="License MIT" src="https://img.shields.io/badge/code%20license-MIT-555555">
+  <img alt="输出可编辑 PPTX" src="https://img.shields.io/badge/output-editable%20PPTX-2F855A">
+  <img alt="MIT License" src="https://img.shields.io/badge/code%20license-MIT-555555">
 </p>
 
-## Why this project exists
+## 为什么要做这个项目
 
-One-click AI slide generators solve the blank-page problem, but often create a more awkward one:
+大模型已经能一键生成一套“看起来很完整”的 PPT，但对科研汇报来说，这种完整往往只是表面的：
 
-- the entire deck is flattened into images and is painful to edit;
-- every slide is polished like a product launch, even when the setting is a weekly research seminar;
-- the deck looks complete before it has actually understood the paper;
-- decorative visuals replace evidence, while important methods and experiments quietly disappear;
-- the presenter receives a finished-looking file they cannot confidently explain or revise.
+- 整页被生成成一张图片，文字、图表和版式几乎无法继续修改；
+- 每一页都像产品发布会一样精致、花哨，却不符合组会和讨论班的语境；
+- PPT 已经做完了，模型却没有真正覆盖论文的方法小节和主要实验；
+- 装饰性视觉替代了论文证据，关键边界条件和数值语境被压缩掉；
+- 汇报人拿到的是一个“成品”，但自己无法有把握地解释、修正和继续打磨。
 
-In a research group, those fingerprints are visible immediately. The problem is not simply that AI was used. The problem is that the deck carries the familiar “one-click look”: too generic, too ornamental, too shallow, or impossible to correct. It feels less like a student’s seminar deck and more like an AI presentation demo.
+在科研汇报中，这些特征通常很容易被导师看出来。真正尴尬的不只是“使用了 AI”，而是整套 PPT 带着明显的“一键生成感”：内容泛化、审美用力过猛、论文理解太浅，或者连一个错误都很难修改。它不像学生为组会准备的汇报，更像一次 AI 演示。
 
-**Paper2Seminar is a dedicated one-request generator for academic-paper presentations.** Give it a paper PDF and one instruction; it reads the paper, budgets the deck, plans every slide, routes the visuals, assembles an editable PPTX, and runs QA.
+**Paper2Seminar 是一个专用于学术论文汇报的一次请求式生成工具。** 给它一篇论文和一句要求，它自动完成全文阅读、页数规划、逐页设计、视觉选择、可编辑 PPTX 组装和质量检查。
 
-The target is a solid **80-point seminar deck by default**: complete and polished enough to use directly, but restrained enough to look natural in a lab meeting. It may not be as spectacular as a fully image-generated ChatGPT deck. That is intentional. It should require fact-checking and optional personalization, not a manual rebuild.
+我们的目标是默认直接生成一份可靠的 **80 分组会 PPT**：完整度和精致度已经足够使用，同时保持普通科研汇报应有的克制。它未必比 ChatGPT 整页生图做出的 PPT 更惊艳，但不会让人第一眼就感到“这是大模型一键做的”。用户需要做的应当是事实核对和可选的个人化调整，而不是重新制作一遍。
 
-> **One-click is the interface, not the aesthetic.**
+> **一键，是交互方式；不是“一键生成感”的审美。**
 
-## What “doesn’t look one-click” means
+## 什么叫“不像一键生成”
 
-| Typical one-click deck | Paper2Seminar |
+| 常见一键生成 PPT | Paper2Seminar |
 |---|---|
-| Prompt in, finished-looking deck out | Full paper inventory, coverage map, slide plan, assets, assembly, and QA |
-| Slides or text flattened into images | Editable PPTX text, shapes, pictures, and speaker notes |
-| Marketing-style layouts and decorative variety | A restrained seminar template with predictable academic structure |
-| Visuals chosen for appearance | Visuals routed by purpose: paper evidence, exact redraw, TikZ synthesis, or concept image |
-| Short, generic summary of a long paper | Complexity-aware slide budgeting and subsection-level coverage |
-| Fixing one claim may require regeneration | `deck-plan.json` remains the reviewable source of truth |
-| “Looks done” is treated as done | Explicit asset approval, slide approval, structural checks, and optional readability review |
+| 输入提示词，直接得到一个看似完成的成品 | 先读论文，再做覆盖矩阵、逐页计划、资产生成、组装和 QA |
+| 文字和页面被压成图片 | 输出可编辑的 PPTX 文字、形状、图片和讲稿备注 |
+| 偏营销化的版式和装饰性变化 | 使用克制、稳定、符合科研语境的讨论班模板 |
+| 图片首先服务于“好看” | 图片按用途选择：论文证据、精确重绘、TikZ 综合图或概念图 |
+| 长论文被概括成几页泛化总结 | 根据论文复杂度分配页数，并检查小节级覆盖情况 |
+| 修改一个结论可能需要整套重生成 | `deck-plan.json` 始终是可审查、可修改的单一事实源 |
+| “看起来做完”就等于完成 | 资产审批、逐页审批、结构检查和可选可读性检查缺一不可 |
 
-The goal is not to inject fake imperfections. The deck feels naturally prepared because it follows familiar seminar conventions: sensible density, restrained styling, paper-grounded figures, ordinary editable objects, and a narrative that reflects the structure of the paper.
+这里的“有人味”不是故意制造粗糙和瑕疵，而是遵循真实组会里熟悉的表达方式：信息密度合理、设计克制、图表来自论文、对象保持可编辑，整套叙事也能对应论文真实结构。
 
-## See the output
+## 看看实际产出
 
-These are rendered slides from complete decks generated by the workflow, not hand-built mockups.
+下面全部来自工作流生成的完整 PPT，不是为了 README 单独手工制作的效果图。
 
 <table>
   <tr>
     <td width="50%" align="center">
-      <a href="examples/gallery/webcloak-paper-evidence.png"><img src="examples/gallery/webcloak-paper-evidence.png" alt="Paper evidence preserved in a WebCloak slide"></a><br>
-      <sub><strong>Paper evidence</strong> — original research content kept in context</sub>
+      <a href="examples/gallery/webcloak-paper-evidence.png"><img src="examples/gallery/webcloak-paper-evidence.png" alt="WebCloak 论文证据页面"></a><br>
+      <sub><strong>论文证据</strong> — 保留原始研究内容和必要语境</sub>
     </td>
     <td width="50%" align="center">
-      <a href="examples/gallery/webcloak-method.png"><img src="examples/gallery/webcloak-method.png" alt="WebCloak method mechanism slide"></a><br>
-      <sub><strong>Method mechanism</strong> — restrained explanation around a paper figure</sub>
+      <a href="examples/gallery/webcloak-method.png"><img src="examples/gallery/webcloak-method.png" alt="WebCloak 方法机制页面"></a><br>
+      <sub><strong>方法机制</strong> — 围绕论文图表进行克制解释</sub>
     </td>
   </tr>
   <tr>
     <td width="50%" align="center">
-      <a href="examples/gallery/beyond-rtt-tikz.png"><img src="examples/gallery/beyond-rtt-tikz.png" alt="Beyond RTT TikZ synthesis slide"></a><br>
-      <sub><strong>TikZ synthesis</strong> — a presenter-oriented view across paper subsections</sub>
+      <a href="examples/gallery/beyond-rtt-tikz.png"><img src="examples/gallery/beyond-rtt-tikz.png" alt="Beyond RTT TikZ 综合图页面"></a><br>
+      <sub><strong>TikZ 综合图</strong> — 将多个论文小节整理成适合讲解的结构</sub>
     </td>
     <td width="50%" align="center">
-      <a href="examples/gallery/beyond-rtt-results.png"><img src="examples/gallery/beyond-rtt-results.png" alt="Beyond RTT data redraw slide"></a><br>
-      <sub><strong>Data redraw</strong> — exact comparable values in an editable academic chart</sub>
+      <a href="examples/gallery/beyond-rtt-results.png"><img src="examples/gallery/beyond-rtt-results.png" alt="Beyond RTT 数据重绘页面"></a><br>
+      <sub><strong>数据重绘</strong> — 使用准确可比数值生成可编辑学术图表</sub>
     </td>
   </tr>
 </table>
 
-### Complete-deck outlines
+### 完整大纲总览
 
 <details>
-  <summary><strong>WebCloak — 32-slide complete seminar deck</strong></summary>
-  <p align="center"><a href="examples/gallery/webcloak-overview.png"><img src="examples/gallery/webcloak-overview.png" width="100%" alt="WebCloak 32-slide deck overview"></a></p>
+  <summary><strong>WebCloak — 32 页完整讨论班 PPT</strong></summary>
+  <p align="center"><a href="examples/gallery/webcloak-overview.png"><img src="examples/gallery/webcloak-overview.png" width="100%" alt="WebCloak 32 页 PPT 总览"></a></p>
 </details>
 
 <details>
-  <summary><strong>Beyond RTT — 30-slide complete seminar deck</strong></summary>
-  <p align="center"><a href="examples/gallery/beyond-rtt-overview.png"><img src="examples/gallery/beyond-rtt-overview.png" width="100%" alt="Beyond RTT 30-slide deck overview"></a></p>
+  <summary><strong>Beyond RTT — 30 页完整讨论班 PPT</strong></summary>
+  <p align="center"><a href="examples/gallery/beyond-rtt-overview.png"><img src="examples/gallery/beyond-rtt-overview.png" width="100%" alt="Beyond RTT 30 页 PPT 总览"></a></p>
 </details>
 
-| Editable sample | Slides | Download |
+| 可编辑样例 | 页数 | 下载 |
 |---|---:|---|
 | WebCloak · IEEE S&P 2026 | 32 | [PPTX](examples/decks/webcloak-seminar.pptx) |
 | Beyond RTT · NDSS 2026 | 30 | [PPTX](examples/decks/beyond-rtt-seminar.pptx) |
 
-Both PPTX files pass OpenXML validation with no reported OfficeCLI issues. See the [sample-deck notes](examples/README.md) for validation details and third-party content attribution boundaries.
+两份 PPTX 均通过 OpenXML 校验，OfficeCLI 未报告结构问题。验证信息及论文第三方内容的权利边界见 [样例说明](examples/README.md)。
 
-## The controls behind the result
+## 这种效果是怎样被控制出来的
 
-There is no single “make it human” prompt. The workflow earns that quality through a sequence of constraints:
+不存在一句万能的“生成得像人做的”提示词。这个项目依靠一条受约束的技术路线获得稳定结果：
 
 ```text
 paper.pdf
-  -> full-paper inventory
-  -> subsection coverage matrix
-  -> complexity-aware slide budget
-  -> ordered deck-plan.json
-  -> evidence-aware visual routing
-  -> reviewed visual assets
-  -> deterministic editable PPTX assembly
-  -> structural + content + visual QA
+  -> 完整论文清单
+  -> 小节覆盖矩阵
+  -> 按复杂度确定页数
+  -> 有序的 deck-plan.json
+  -> 按证据类型选择视觉路线
+  -> 独立审核视觉资产
+  -> 确定性组装可编辑 PPTX
+  -> 结构 + 内容 + 视觉 QA
 ```
 
-### Content control
+### 内容控制
 
-- Read the complete paper before planning the deck.
-- Map core method subsections, research questions, and primary experiments to slides.
-- Write the complete title sequence before generating visual assets.
-- Separate paper claims from presenter analysis and preserve exact numerical context.
+- 在规划 PPT 前完整阅读论文，而不是只读取摘要和结论。
+- 将核心方法小节、研究问题和主要实验逐一映射到幻灯片。
+- 先写完整标题序列，再开始生成图片和修改 PPT。
+- 区分论文原始结论与汇报者分析，并保留关键数值的准确语境。
 
-### Visual control
+### 视觉控制
 
-- Prefer original paper figures for methods and experimental evidence.
-- Use Matplotlib redraws only for exact, genuinely comparable values.
-- Use TikZ for synthesized mechanisms and causal structure.
-- Restrict generated or external imagery to conceptual communication, never experimental proof.
-- Review crops and generated assets before they are allowed into the deck.
+- 方法和实验结果优先使用论文原图。
+- 只有存在准确、可比较数据时才使用 Matplotlib 重绘。
+- 使用 TikZ 表达跨小节综合得到的机制、流程和因果关系。
+- 生图和外部图片只服务于概念表达，不能冒充实验或系统结构证据。
+- 所有裁剪图、综合图和生成图必须先独立审核，再进入 PPT。
 
-### Format control
+### 格式控制
 
-- Assemble from a pristine 16:9 seminar template instead of painting every slide into a bitmap.
-- Keep body copy, emphasis, slide order, images, notes, and alt text editable in PPTX.
-- Use a deliberately restrained fixed layout so the deck reads like research work, not a landing page.
+- 从完整的 16:9 讨论班模板组装，而不是把每页绘制成不可编辑位图。
+- 正文、强调、图片、页序、讲稿备注和替代文本继续保留为可编辑 PPTX 对象。
+- 默认采用克制、固定的正文布局，让页面像科研汇报，而不是营销网站。
 
-### QA control
+### 质量控制
 
-- Validate the plan before asset generation, before assembly, and after approval.
-- Record capabilities, source paths, hashes, approvals, and output locations per run.
-- Keep PowerPoint rendering optional and separate from core assembly.
-- Treat script success as necessary but never sufficient for semantic approval.
+- 在生成资产前、组装前和最终审批后分别校验 `deck-plan.json`。
+- 每次运行记录工具能力、输入输出路径、hash 和审批状态。
+- PowerPoint 页面渲染是可选检查，不阻塞核心 PPTX 组装。
+- 脚本成功只是必要条件，不能代替论文语义和最终视觉审核。
 
-## What it produces
+## 最终会得到什么
 
-- A complete Chinese seminar deck with necessary English technical terms.
-- An editable `.pptx`, assembled through OfficeCLI from the bundled template.
-- A structured `deck-plan.json` containing slide copy, visual decisions, notes, and review state.
-- Paper crops, manual-crop provenance, TikZ sources, data-redraw specifications, and manifests.
-- A browser-rendered one-page paper summary.
-- Optional overview or grouped readability images for final review.
+- 一份完整的中文讨论班 PPT，并保留必要的英文技术术语。
+- 一份由 OfficeCLI 从固定模板组装的可编辑 `.pptx`。
+- 包含逐页正文、视觉决策、讲稿和审核状态的 `deck-plan.json`。
+- 论文裁剪图、手动裁剪来源、TikZ 源文件、数据重绘规格和运行 manifest。
+- 一张通过浏览器渲染的论文一页纸总结。
+- 可选的全局总览图或分组可读性检查图。
 
-The workflow is currently strongest on 12–16+ page systems, security, networking, and measurement papers. A full paper typically receives 26–32 slides unless the user explicitly asks for a short talk.
+当前工作流最适合 12–16 页以上的系统、安全、网络和测量类论文。除非用户明确要求短讲，完整论文通常会得到 26–32 页 PPT。
 
-## Quick start
+## 快速开始
 
-Open the repository as the agent working directory, place or reference a paper PDF, and ask:
+将仓库作为 agent 的工作目录打开，提供论文 PDF，然后提出类似请求：
 
 ```text
-Use paper-ppt-orchestrator to turn ./paper.pdf into a complete, deliverable Chinese seminar PPT. Follow the default workflow and create a new run directory.
+请使用 paper-ppt-orchestrator，将 ./paper.pdf 制作成完整可交付的中文讨论班 PPT。按默认流程执行，并输出到新的 runs 目录。
 ```
 
-For Codex, the explicit form is:
+Codex 可以显式调用：
 
 ```text
-Use $paper-ppt-orchestrator to turn ./paper.pdf into a complete, deliverable Chinese seminar PPT.
+请使用 $paper-ppt-orchestrator，将 ./paper.pdf 制作成完整可交付的中文讨论班 PPT。
 ```
 
-The repository-local loaders allow Codex and OpenCode to discover `.agents/skills/paper-ppt-orchestrator`, while Claude Code can discover `.claude/skills/paper-ppt-orchestrator`.
+Codex 和 OpenCode 可通过 `.agents/skills/paper-ppt-orchestrator` 自动发现，Claude Code 可通过 `.claude/skills/paper-ppt-orchestrator` 自动发现。
 
-## Requirements
+## 环境要求
 
-Core execution requires:
+核心流程需要：
 
-- A capable tool-using agent with filesystem and shell access.
-- Python 3.10+ and packages from `requirements.txt`.
-- [OfficeCLI](https://officecli.ai/) for PPTX inspection and assembly.
-- A Chromium-family browser for the one-page HTML render.
-- XeLaTeX and `pdftoppm` when the full workflow routes a slide to TikZ.
+- 具备文件系统和 Shell 工具的 agent 模型。
+- Python 3.10+ 及 `requirements.txt` 中的依赖。
+- [OfficeCLI](https://officecli.ai/)，用于检查和组装 PPTX。
+- Chromium 系浏览器，用于渲染一页纸 HTML。
+- 完整流程选择 TikZ 时需要 XeLaTeX 和 `pdftoppm`。
 
-Optional capabilities:
+可选能力：
 
-- CaptionCrop for automated figure extraction; a provenance-recorded manual crop path is available as fallback.
-- Image generation or licensed web-image search for conceptual imagery.
-- Microsoft PowerPoint on Windows for the optional highest-fidelity readability export. Core assembly does not require it.
+- `requirements-doclayout.txt` 中的默认 DocLayout 图表检测后端，以及单独下载并校验的固定模型。
+- CaptionCrop 作为保留的轻量抽取后端；带来源记录的手动裁剪仍是最终回退。
+- 图片生成或具有明确授权信息的网络图片搜索。
+- Windows PowerPoint，用于可选的高保真最终尺寸检查；核心组装不依赖它。
 
-Run capability preflight before visual routing:
+安装并运行默认的论文图表抽取器：
+
+```text
+python -m pip install -r requirements-doclayout.txt
+python skills/paper-ppt-orchestrator/scripts/paper_ppt.py download-layout-model
+python skills/paper-ppt-orchestrator/scripts/paper_ppt.py extract-assets paper.pdf -o runs/demo/assets/paper/extracted --clean
+```
+
+默认路线只使用 DocLayout-YOLO 检测图和表的区域，再以 300 DPI 从 PDF 原始页面裁剪，输出相对路径 manifest、标注页和 contact sheet。要使用原来的轻量路线，显式传入 `--backend captioncrop --captioncrop-command PATH`。模型校验、已知边界和 AGPL 许可说明见[图表抽取契约](skills/paper-ppt-orchestrator/references/figure-extraction.md)。
+
+视觉规划前可以执行能力预检：
 
 ```text
 python skills/paper-ppt-orchestrator/scripts/paper_ppt.py preflight -o runs/demo/capabilities.json --imagegen unavailable --web-search unavailable
 ```
 
-## Framework installation
+## 框架安装
 
-For standalone installation, copy `skills/paper-ppt-orchestrator/` to the framework’s skill directory:
+独立安装时，将 `skills/paper-ppt-orchestrator/` 整体复制到对应框架目录：
 
-| Framework | Install destination | Typical invocation |
+| 框架 | 安装位置 | 常用调用方式 |
 |---|---|---|
-| Codex | `$CODEX_HOME/skills/paper-ppt-orchestrator` or `~/.codex/skills/paper-ppt-orchestrator` | `$paper-ppt-orchestrator` |
-| OpenCode | project `.agents/skills/paper-ppt-orchestrator` or its configured skill directory | natural-language request / skill tool |
-| Claude Code | `.claude/skills/paper-ppt-orchestrator` or `~/.claude/skills/paper-ppt-orchestrator` | `/paper-ppt-orchestrator` |
+| Codex | `$CODEX_HOME/skills/paper-ppt-orchestrator` 或 `~/.codex/skills/paper-ppt-orchestrator` | `$paper-ppt-orchestrator` |
+| OpenCode | 项目 `.agents/skills/paper-ppt-orchestrator` 或配置的 skill 目录 | 自然语言请求或 skill 工具 |
+| Claude Code | `.claude/skills/paper-ppt-orchestrator` 或 `~/.claude/skills/paper-ppt-orchestrator` | `/paper-ppt-orchestrator` |
 
-`agents/openai.yaml` keeps its standard filename. It is optional Codex-facing metadata, not the portable workflow definition; other frameworks use `SKILL.md`.
+`agents/openai.yaml` 保留标准文件名。它只是 Codex 的可选界面元数据；可移植的工作流定义仍然是 `SKILL.md`。
 
-See [framework and platform compatibility](docs/compatibility.md) for the exact portability boundary.
+完整边界见 [框架与平台兼容性说明](docs/compatibility.md)。
 
-## Repository layout
+## 仓库目录
 
 ```text
 .
-|-- .agents/skills/paper-ppt-orchestrator/   # Codex/OpenCode repository loader
-|-- .claude/skills/paper-ppt-orchestrator/   # Claude Code repository loader
-|-- skills/paper-ppt-orchestrator/           # canonical, self-contained skill
+|-- .agents/skills/paper-ppt-orchestrator/   # Codex/OpenCode 仓库加载器
+|-- .claude/skills/paper-ppt-orchestrator/   # Claude Code 仓库加载器
+|-- skills/paper-ppt-orchestrator/           # 可独立分发的规范 skill
 |   |-- SKILL.md
 |   |-- agents/openai.yaml
 |   |-- assets/
 |   |-- references/
 |   `-- scripts/
 |-- examples/
-|   |-- decks/                                 # curated editable sample PPTX files
-|   `-- gallery/                               # selected slides and full-deck overviews
+|   |-- decks/                                 # 精选的可编辑样例 PPTX
+|   `-- gallery/                               # 精选页面与完整大纲总览
 |-- tests/
 `-- docs/
 ```
 
-`skills/paper-ppt-orchestrator/` is the distributable package. The hidden framework directories are repository-local loaders, not independent copies.
+`skills/paper-ppt-orchestrator/` 是唯一的规范实现；两个隐藏目录只是仓库内的自动发现入口。
 
-## Current boundaries
+## 当前边界
 
-- The project produces a strong first deliverable, not an unsupervised final truth.
-- Semantic accuracy still depends on the model reading the paper correctly and on human review.
-- The default content layout is intentionally fixed and restrained rather than infinitely themeable.
-- The bundled template retains its current UCAS identity and presenter/advisor defaults; replace them in Slide Master and the cover/closing slides when needed.
-- Source papers and `runs/` are excluded from version control. Only curated, validated demonstration decks and renders are kept under `examples/` with a third-party content notice.
+- 项目提供可靠的首轮交付物，不承诺无人监督的最终真理。
+- 语义准确性仍取决于模型是否正确理解论文以及最终人工审核。
+- 当前正文布局有意保持固定和克制，而不是追求无限主题和版式变化。
+- 随附模板保留现有国科大视觉标识和默认汇报人/指导老师姓名，需要时可在幻灯片母版、封面和结束页中替换。
+- 论文 PDF 和 `runs/` 不进入版本控制；只有经过验证并附带第三方内容说明的展示样例保存在 `examples/` 中。
 
-## Development
+## 开发验证
 
 ```text
 python -m pip install -r requirements.txt
+# 可选：真实模型抽取测试与使用
+python -m pip install -r requirements-doclayout.txt
 python -m unittest discover -s tests -v
 python skills/paper-ppt-orchestrator/scripts/validate_deck_plan.py examples/deck-plan.example.json --stage plan
 ```
 
-Read [architecture](docs/architecture.md) and [contributing](CONTRIBUTING.md) before changing the deck-plan contract, builder, or bundled assets.
+修改 `deck-plan.json` 契约、builder 或模板前，请先阅读 [架构说明](docs/architecture.md) 和 [贡献指南](CONTRIBUTING.md)。
 
-## Licensing
+## 许可证
 
-Repository-authored code and documentation are licensed under the MIT License. Third-party tools remain under their own licenses. UCAS names and marks in the bundled template are not granted under MIT; replace them when their use is not authorized. See [THIRD_PARTY.md](THIRD_PARTY.md) for the boundary.
+仓库原创代码和文档采用 MIT License。第三方工具遵循各自许可证。随附模板中的国科大名称和标识不因本仓库采用 MIT License 而获得额外授权，不适用时请自行替换。具体边界见 [THIRD_PARTY.md](THIRD_PARTY.md)。
 
-If this workflow saves you from choosing between an obviously generated deck and rebuilding everything by hand, consider starring the repository. Stars help us understand whether this problem is shared beyond one research group.
+如果这个工作流帮助你避开了“明显的一键生成 PPT”和“全部推倒重做”之间的两难，欢迎给仓库一个 Star。它也能帮助我们判断，这是否是更多研究生和科研团队共同面对的问题。
