@@ -100,6 +100,14 @@
 
 不存在一句万能的“生成得像人做的”提示词。这个项目依靠一条受约束的技术路线获得稳定结果：
 
+<p align="center">
+  <img src="docs/assets/workflow-pipeline.zh-CN.gif" width="100%" alt="Paper2Seminar 从全文理解、覆盖规划、视觉路由、可编辑组装到多阶段 QA 的动态流程">
+</p>
+<p align="center"><sub>证据包沿受控流水线逐步推进；每个模块都有明确输入、状态与质量门禁。</sub></p>
+
+<details>
+<summary><strong>查看文本版完整流程</strong></summary>
+
 ```text
 paper.pdf
   -> 完整论文清单
@@ -111,6 +119,8 @@ paper.pdf
   -> 确定性组装可编辑 PPTX
   -> 结构 + 内容 + 视觉 QA
 ```
+
+</details>
 
 ### 🧠 内容控制
 

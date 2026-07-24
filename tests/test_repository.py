@@ -7,6 +7,8 @@ import zipfile
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
+from PIL import Image, ImageSequence
+
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILL_ROOT = ROOT / "skills" / "paper-ppt-orchestrator"
@@ -72,6 +74,27 @@ class RepositoryTests(unittest.TestCase):
         self.assertIn("doclayout-yolo==0.0.4", requirements)
         self.assertIn("torchvision==0.23.0", requirements)
         self.assertEqual(list(SKILL_ROOT.rglob("*.pt")), [])
+
+    def test_readme_workflow_animations_are_complete_and_bounded(self) -> None:
+        self.assertTrue((ROOT / "docs" / "render_workflow_animation.py").is_file())
+        for name in ("workflow-pipeline.zh-CN.gif", "workflow-pipeline.en.gif"):
+            path = ROOT / "docs" / "assets" / name
+            with self.subTest(name=name):
+                self.assertTrue(path.is_file())
+                self.assertLess(path.stat().st_size, 6_000_000)
+                with Image.open(path) as animation:
+                    self.assertEqual(animation.size, (1200, 560))
+                    self.assertTrue(animation.is_animated)
+                    self.assertGreaterEqual(animation.n_frames, 60)
+                    self.assertLessEqual(animation.n_frames, 72)
+                    self.assertEqual(animation.info.get("duration"), 80)
+                    total_duration = sum(
+                        frame.info.get("duration", 0) for frame in ImageSequence.Iterator(animation)
+                    )
+                    self.assertEqual(total_duration, 5_760)
+                    first = animation.convert("RGB").tobytes()
+                    animation.seek(42)
+                    self.assertNotEqual(first, animation.convert("RGB").tobytes())
 
     def test_curated_examples_are_complete(self) -> None:
         decks = {

@@ -100,6 +100,14 @@ Both PPTX files pass OpenXML validation with no reported OfficeCLI issues. See t
 
 There is no single “make it human” prompt. The workflow earns that quality through a sequence of constraints:
 
+<p align="center">
+  <img src="docs/assets/workflow-pipeline.en.gif" width="100%" alt="Animated Paper2Seminar pipeline from full-paper reading and coverage planning through visual routing, editable assembly, and multi-stage QA">
+</p>
+<p align="center"><sub>An evidence packet advances through a controlled pipeline; every module has an explicit input, state, and quality gate.</sub></p>
+
+<details>
+<summary><strong>View the complete text-only workflow</strong></summary>
+
 ```text
 paper.pdf
   -> full-paper inventory
@@ -111,6 +119,8 @@ paper.pdf
   -> deterministic editable PPTX assembly
   -> structural + content + visual QA
 ```
+
+</details>
 
 ### 🧠 Content control
 

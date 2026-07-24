@@ -26,3 +26,13 @@ The boundary matters for portability: any capable agent framework can provide th
 ## Packaging
 
 `skills/paper-ppt-orchestrator/` follows the Agent Skills layout and is the only distributable package. `agents/openai.yaml` is an optional Codex adapter. `.agents/` and `.claude/` contain repository-local discovery loaders and are not independent copies of the skill.
+
+## README workflow animation
+
+The localized GIFs under `docs/assets/workflow-pipeline.*.gif` are generated assets, not hand-edited binaries. Rebuild both deterministic 1200x560 animations with:
+
+```text
+python docs/render_workflow_animation.py
+```
+
+Use `--preview-dir` to export representative PNG frames for visual QA. The source keeps module geometry, timing, localized copy, and the evidence-packet return loop in one file so the Chinese and English README visuals stay structurally aligned.
