@@ -1,0 +1,31 @@
+{
+  "version": "0.1",
+  "chart_type": "horizontal_bar",
+  "title": "",
+  "x_label": "访问网络缩减倍数",
+  "y_label": "",
+  "unit": "x",
+  "categories": ["E3-Cadets", "E3-Theia", "E3-Trace", "E5-Cadets", "E5-Theia", "E5-Trace"],
+  "series": [
+    {
+      "name": "Events / Links",
+      "values": [29.9, 75.8, 27.3, 33.4, 46.3, 219.0]
+    }
+  ],
+  "show_values": true,
+  "value_decimals": 0,
+  "highlight_series": "Events / Links",
+  "source_hint": {
+    "paper_page": 8,
+    "section": "Evaluation",
+    "artifact": "Table IV",
+    "extraction": "paper_table",
+    "note": "从可复制的 Table IV 读取六个数据集的 Reduc 列，不使用 OCR"
+  },
+  "output": {
+    "width_px": 2400,
+    "height_px": 1000,
+    "dpi": 200,
+    "background": "white"
+  }
+}

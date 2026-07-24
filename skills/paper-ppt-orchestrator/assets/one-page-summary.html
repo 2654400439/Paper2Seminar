@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>论文讨论班一页纸</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #f5f7fa;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .page {
+            max-width: 920px;
+            width: 100%;
+            background: #ffffff;
+            padding: 26px 28px 28px 28px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+        h1 {
+            font-size: 22px;
+            font-weight: 700;
+            text-align: center;
+            color: #1a3c6e;
+            letter-spacing: 1px;
+            padding-bottom: 8px;
+            border-bottom: 3px solid #1a3c6e;
+            margin-bottom: 14px;
+        }
+        .sub {
+            text-align: center;
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 16px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        th {
+            background: #1a3c6e;
+            color: #ffffff;
+            font-weight: 600;
+            padding: 9px 10px;
+            text-align: left;
+            border: 1px solid #1a3c6e;
+        }
+        td {
+            padding: 9px 10px;
+            border: 1px solid #dce3ed;
+            vertical-align: top;
+            background: #ffffff;
+        }
+        .label {
+            font-weight: 700;
+            color: #1a3c6e;
+            white-space: nowrap;
+        }
+        .dim {
+            color: #777;
+            font-size: 12px;
+        }
+        .tag {
+            display: inline-block;
+            background: #eef3f9;
+            border-radius: 4px;
+            padding: 1px 10px;
+            font-size: 12px;
+            color: #1a3c6e;
+            margin: 2px 4px 2px 0;
+        }
+        .tag.green {
+            background: #e6f5ed;
+            color: #1a6e4a;
+        }
+        .tag.orange {
+            background: #fef0e0;
+            color: #b45f1b;
+        }
+        .tag.purple {
+            background: #ede7f5;
+            color: #6a3d8a;
+        }
+        .rule {
+            background: #fef6f0;
+            border: 1px solid #f5dcca;
+            border-radius: 6px;
+            padding: 8px 14px;
+            margin-top: 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #a04020;
+            text-align: center;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 12px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+        .algo-route {
+            font-size: 12px;
+            color: #1a3c6e;
+            background: #f0f4fa;
+            border-radius: 12px;
+            padding: 2px 12px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+        @media print {
+            body {
+                background: #fff;
+                padding: 0.2in;
+            }
+            .page {
+                box-shadow: none;
+                padding: 0;
+                border-radius: 0;
+            }
+            th {
+                background: #1a3c6e !important;
+                color: #fff !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <h1>论文讨论班一页纸</h1>
+    <div class="sub">以前只讲“谁解决了什么问题”，现在扩展为“威胁模型分析+算法学习”</div>
+
+    <table>
+        <thead>
+        <tr>
+            <th style="width:13%;">维度</th>
+            <th style="width:26%;">必须回答的问题</th>
+            <th style="width:61%;">说明 / 示例</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 维度1：问题归类 -->
+        <tr>
+            <td class="label">问题归类</td>
+            <td>属于哪个研究主题？</td>
+            <td>
+                <span class="tag">网站指纹识别</span>
+                <span class="tag">APP流量分类</span>
+                <span class="tag">恶意域名检测</span>
+                <span class="tag">加密DNS分析</span>
+                <span class="tag">流量分类</span>
+                <span class="tag">威胁狩猎</span>
+                <span class="tag green">其他：______</span>
+            </td>
+        </tr>
+        <!-- 维度2：威胁模型 -->
+        <tr>
+            <td class="label">威胁模型</td>
+            <td>
+                攻击者是谁？<br>
+                攻击目标是什么？<br>
+                攻击方式是什么？<br>
+                作者扮演什么角色？
+            </td>
+            <td><span class="dim">例：攻击者是本地网络的被动监听者，目标是识别用户访问的网站，手段是分析加密流量包长度序列，作者扮演攻击方。</span></td>
+        </tr>
+        <!-- 维度3：边界与局限 -->
+        <tr>
+            <td class="label">边界与局限</td>
+            <td>
+                适用前提是什么？<br>
+                不能处理什么？
+            </td>
+            <td><span class="dim">例：需要大量标记数据，训练测试集需同分布，跨环境会掉点；仅适用于页面加载初始阶段。</span></td>
+        </tr>
+        <!-- 维度4：组内启发（这个维度可以提到算法） -->
+        <tr>
+            <td class="label">组内启发</td>
+            <td>
+                和我们什么工作相关？<br>
+                能学到什么？<br>
+                能否套用？<br>
+                需要什么代价？
+            </td>
+            <td><span class="dim">例：与网站指纹识别相关，我们是防守方可借鉴特征做异常检测，手头有跨运营商数据，预计2-3周可完成复现和改进。</span></td>
+        </tr>
+        <!-- 维度5：算法学习（新增，突出算法路线） -->
+        <tr>
+            <td class="label" style="border-top:2px solid #1a3c6e;background:#f8faff;">算法学习</td>
+            <td style="border-top:2px solid #1a3c6e;background:#f8faff;">
+                用了什么算法？<br>
+                算法基本概念？<br>
+                适用性和局限？<br>
+                哪些论文也用了？<br>
+                能不能改进/复现？
+
+            </td>
+            <td style="border-top:2px solid #1a3c6e;background:#f8faff;">
+                <div style="margin-bottom:4px;font-weight:600;font-size:12px;color:#1a3c6e;">学习路线（例）：</div>
+                <span class="tag">Bandit家族</span> <span style="color:#aaa;">→</span>
+                <span class="tag orange">Contextual Bandit</span> <span style="color:#aaa;">→</span>
+                <span class="tag purple">MCTS</span> <span style="color:#aaa;">→</span>
+                <span class="tag green">因果推断</span> <span style="color:#aaa;">→</span>
+                <span class="tag">博弈论</span>
+                <div style="margin-top:6px;font-size:12px;color:#555;">
+                    <span class="dim">学一个 → 套一个 → 用我们的数据\简易数据验证一个</span>
+                </div>
+                <div style="margin-top:6px;font-size:12px;color:#555;border-top:1px dashed #ddd;padding-top:6px;">
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="rule">
+        注意：逐项核对分析维度，并明确区分论文事实与汇报者判断。<br>
+    </div>
+    <div class="footer">Paper2Seminar</div>
+</div>
+</body>
+</html>

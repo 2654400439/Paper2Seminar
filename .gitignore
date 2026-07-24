@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# Generated paper workflow artifacts
+runs/
+build/
+qa/
+*.pdf
+*.pptx
+*.ppt
+*.aux
+*.log
+*.out
+*.synctex.gz
+
+# Keep the distributable template tracked
+!skills/paper-ppt-orchestrator/assets/seminar-template.pptx
+
+# Local editor and OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.tmp
+*.bak

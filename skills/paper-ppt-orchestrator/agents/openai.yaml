@@ -1,0 +1,7 @@
+interface:
+  display_name: "Paper2Seminar"
+  short_description: "One-click natural paper seminar decks"
+  default_prompt: "Use $paper-ppt-orchestrator to build a complete validated Chinese discussion-group PPT from the paper PDF at the path I provide."
+
+policy:
+  allow_implicit_invocation: true

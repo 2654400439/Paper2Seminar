@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:paper-ppt-orchestrator:schema:data-viz:0.1",
+  "title": "PaperEvidenceViz specification",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "chart_type", "output"],
+  "properties": {
+    "version": {"const": "0.1"},
+    "chart_type": {
+      "enum": ["bar", "horizontal_bar", "grouped_bar", "line", "dot_plot", "heatmap", "compact_table"]
+    },
+    "title": {"type": "string"},
+    "x_label": {"type": "string"},
+    "y_label": {"type": "string"},
+    "unit": {"type": "string"},
+    "categories": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "series": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "values"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "values": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 8,
+            "items": {"type": "number"}
+          }
+        }
+      }
+    },
+    "table": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["columns", "rows"],
+      "properties": {
+        "columns": {
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 5,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "rows": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 6,
+          "items": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 5,
+            "items": {"type": ["string", "number"]}
+          }
+        },
+        "highlight_rows": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "integer", "minimum": 0, "maximum": 5}
+        }
+      }
+    },
+    "show_values": {"type": "boolean"},
+    "value_decimals": {"type": "integer", "minimum": 0, "maximum": 3},
+    "highlight_series": {"type": "string"},
+    "source_hint": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "paper_page": {"type": "integer", "minimum": 1},
+        "section": {"type": "string"},
+        "artifact": {"type": "string"},
+        "extraction": {"enum": ["paper_text", "paper_table", "manual_transcription"]},
+        "note": {"type": "string"}
+      }
+    },
+    "output": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width_px", "height_px", "dpi", "background"],
+      "properties": {
+        "width_px": {"type": "integer", "minimum": 1600, "maximum": 4800},
+        "height_px": {"type": "integer", "minimum": 600, "maximum": 2400},
+        "dpi": {"type": "integer", "minimum": 100, "maximum": 300},
+        "background": {"enum": ["white", "transparent"]}
+      }
+    }
+  }
+}
