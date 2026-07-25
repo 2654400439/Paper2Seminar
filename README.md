@@ -253,6 +253,23 @@ python skills/paper-ppt-orchestrator/scripts/paper_ppt.py preflight -o runs/demo
 - 随附模板保留现有国科大视觉标识和默认汇报人/指导老师姓名，需要时可在幻灯片母版、封面和结束页中替换。
 - 论文 PDF 和 `runs/` 不进入版本控制；只有经过验证并附带第三方内容说明的展示样例保存在 `examples/` 中。
 
+## 📊 与现有方案的定位对比
+
+下面比较的是各项目或产品截至 **2026-07-25** 在官方仓库、论文或帮助中心公开的能力，不是同一数据集和统一评价协议下的性能排名。“整页图像”表示修改文字通常需要重新生成页面；“源码级”表示可编辑 LaTeX 等源文件，但不是原生 PowerPoint 对象；“对象级”表示可在对应演示软件中继续编辑文字、形状或图表，具体覆盖范围仍以各产品当前版本为准。
+
+| 方案 | 论文适配 | 主要成品与编辑层级 | 论文证据与流程特点 | 开源 / 使用形态 |
+|---|---|---|---|---|
+| [HKUDS/Paper2Slides](https://github.com/HKUDS/Paper2Slides) | 论文、报告及通用文档 | **整页图像**：逐页 PNG + 汇总 PDF | RAG、图表与结构抽取、来源关联、分阶段 checkpoint；视觉路线侧重逐页图像生成 | MIT；本地 CLI + 自托管 Web |
+| [takashiishida/paper2slides](https://github.com/takashiishida/paper2slides) | 专注 arXiv LaTeX 论文 | **源码级**：Beamer `.tex` + PDF，不输出 PPTX | 利用 LaTeX 与 caption 组织内容和图片；支持 LLM 自检与可选 linter 回修 | MIT；本地 CLI / Streamlit，依赖 `pdflatex` 与模型 API |
+| [OpenDCAI/Paper2Any](https://github.com/OpenDCAI/Paper2Any) | 论文、文本、主题及多模态输入 | **对象级**：可编辑 PPT/PPTX；另有 SVG、draw.io、海报和视频路线 | Paper2PPT 支持长文档、图表抽取、在线大纲与画布编辑；覆盖科研多模态工作流 | Apache-2.0；可自部署；官方说明托管 Studio 与开源代码存在差异，且未完全开源 |
+| [PPTAgent / DeepPresenter](https://github.com/icip-cas/PPTAgent) | 通用主题、附件与参考演示文稿 | **对象级**：PPTX；参考模板编辑与自由布局两条路线 | 从参考演示提取功能类型与内容 schema；包含 Content / Design / Coherence 评价和环境反思路线 | MIT；CLI / WebUI / MCP；Windows 需 WSL |
+| [Presenton](https://github.com/presenton/presenton) | 提示词或上传文档，通用演示场景 | **对象级**：官方声明 fully editable PPTX；同时导出 PDF | 自定义模板、拖拽编辑、BYOK、多模型与图片来源、生成 API；不是论文小节覆盖型流程 | Apache-2.0；Docker 自托管、桌面端与 API |
+| [ChatGPT Work](https://help.openai.com/en/articles/20001278-creating-and-editing-documents-spreadsheets-and-presentations-with-chatgpt-work) / [ChatGPT for PowerPoint](https://help.openai.com/en/articles/20001242-chatgpt-for-powerpoint) | 通用来源材料、长文和已有模板 | **对象级**：Work 可创建原生 Google Slides；PowerPoint 插件保留可编辑幻灯片结构 | 支持参考文件、模板、故事线与缺口审阅；官方同时提示高级图表、形状和格式编辑仍可能受限 | 托管产品 / PowerPoint 插件；能力取决于套餐、工作区与 rollout |
+| [Kimi Slides](https://www.kimi.com/zh-cn/features/slides) | 主题、PDF、Word、PPTX、Excel、Markdown 与图片 | **对象级**：在线编辑并导出 PowerPoint 或 PNG；官方称文字、形状和图表均可编辑 | 长文本理解、搜索与页面引用、文档内图片复用、自定义模板和原生图表组件 | 托管 Web / App 产品 |
+| **Paper2Seminar（本项目）** | **专注完整学术论文与组会汇报** | **对象级**：PPTX 文字、形状、讲稿和强调可编辑；论文裁剪图保持图片资产 | **全文阅读 + 小节覆盖矩阵 + 论文图表溯源 + 精确数据重绘 + TikZ 综合图 + 资产/页面审批 + 可选可读性 QA** | **MIT Agent Skill；本地运行，模型与第三方工具许可单独管理** |
+
+这张表强调的是技术路线差异：图像生成路线通常更容易获得统一视觉风格；Beamer 路线保留学术排版和公式优势；通用原生 PPT 工具更适合广泛办公场景；Paper2Seminar 则把主要约束放在完整论文覆盖、证据忠实度、普通组会语境和可审查交付物上。
+
 ## ✅ 开发验证
 
 ```text
