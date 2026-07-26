@@ -5,3 +5,4 @@
 - Never commit paper PDFs or `runs/` contents. Generated decks and rendered slides are allowed only as curated, validated samples under `examples/` with an explicit content-rights notice.
 - Keep Windows-only PowerPoint automation optional. Core validation and tests must remain runnable without PowerPoint.
 - When changing the deck-plan contract, update its schema, validator, example, and tests in the same change.
+- When adding or changing a configurable feature, update the job-request schema when typed configuration changes, every default profile, the feature registry, Skill behavior, UI control, and synchronization tests together.

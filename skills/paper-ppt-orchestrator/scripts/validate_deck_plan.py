@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 import re
@@ -53,6 +54,14 @@ def path_from(base: Path, value: str) -> Path:
     return path if path.is_absolute() else (base / path).resolve()
 
 
+def sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def is_http_url(value: str) -> bool:
     return bool(re.match(r"^https?://[^\s]+$", value))
 
@@ -60,6 +69,14 @@ def is_http_url(value: str) -> bool:
 def text_units(text: str) -> int:
     """Approximate visual width: CJK counts twice, other non-space chars once."""
     return sum(2 if "\u2e80" <= char <= "\u9fff" else 1 for char in text if not char.isspace())
+
+
+def speech_units(text: str) -> int:
+    """Approximate spoken length for mixed Chinese and English scripts."""
+    cjk = sum(1 for char in text if "\u2e80" <= char <= "\u9fff")
+    without_cjk = re.sub(r"[\u2e80-\u9fff]", " ", text)
+    words = len(re.findall(r"[A-Za-z0-9]+(?:[-'][A-Za-z0-9]+)*", without_cjk))
+    return cjk + round(words * 1.6)
 
 
 def estimated_lines(text: str, units_per_line: int) -> int:
@@ -119,7 +136,7 @@ def validate(plan: Any, stage: str, plan_path: Path, reporter: Reporter) -> None
         reporter.error(
             "$.project.final_readability_mode", "must be off, overview, or full"
         )
-    if stage == "final" and readability_mode in {"overview", "full"}:
+    if stage in {"notes", "final"} and readability_mode in {"overview", "full"}:
         manifest_value = get_str(project, "readability_manifest") or "qa/readability/manifest.json"
         manifest_path = path_from(base, manifest_value)
         if not manifest_path.is_file():
@@ -171,7 +188,36 @@ def validate(plan: Any, stage: str, plan_path: Path, reporter: Reporter) -> None
                     "$.project.readability_manifest", f"cannot inspect manifest: {exc}"
                 )
 
-    if stage in {"assembly", "final"}:
+    speaker_config = project.get("speaker_notes", {"enabled": False})
+    if not isinstance(speaker_config, dict):
+        reporter.error("$.project.speaker_notes", "must be an object")
+        speaker_config = {"enabled": False}
+    notes_enabled = speaker_config.get("enabled", False)
+    if not isinstance(notes_enabled, bool):
+        reporter.error("$.project.speaker_notes.enabled", "must be a boolean")
+        notes_enabled = False
+    if notes_enabled:
+        if speaker_config.get("generation_stage") != "post_qa":
+            reporter.error(
+                "$.project.speaker_notes.generation_stage", "must be post_qa"
+            )
+        if speaker_config.get("delivery_style") != "verbatim":
+            reporter.error(
+                "$.project.speaker_notes.delivery_style", "must be verbatim"
+            )
+        target_notes_minutes = speaker_config.get("target_minutes")
+        if not isinstance(target_notes_minutes, int) or not 5 <= target_notes_minutes <= 120:
+            reporter.error(
+                "$.project.speaker_notes.target_minutes", "must be an integer from 5 to 120"
+            )
+        pace = speaker_config.get("pace_units_per_minute")
+        if not isinstance(pace, int) or not 80 <= pace <= 400:
+            reporter.error(
+                "$.project.speaker_notes.pace_units_per_minute",
+                "must be an integer from 80 to 400",
+            )
+
+    if stage in {"assembly", "notes", "final"}:
         for key in ("paper_pdf", "template_pptx", "one_page_image", "author_visual"):
             value = get_str(project, key)
             if not value:
@@ -287,6 +333,7 @@ def validate(plan: Any, stage: str, plan_path: Path, reporter: Reporter) -> None
     divider_seen: list[str] = []
     content_count = 0
     none_count = 0
+    scripted_seconds = 0
     content_per_section = {section: 0 for section in SECTION_ORDER}
 
     required_role_counts = {
@@ -328,6 +375,36 @@ def validate(plan: Any, stage: str, plan_path: Path, reporter: Reporter) -> None
         if text_units(title) > 80:
             reporter.warn(f"{path}.title", "may be too long for the template title region")
 
+        notes_text = get_str(slide, "speaker_notes")
+        speaker_seconds = slide.get("speaker_seconds")
+        if notes_enabled and stage in {"notes", "final"}:
+            if not notes_text:
+                reporter.error(f"{path}.speaker_notes", "post-QA verbatim script is required")
+            if not isinstance(speaker_seconds, int) or not 5 <= speaker_seconds <= 600:
+                reporter.error(
+                    f"{path}.speaker_seconds", "must be an integer from 5 to 600"
+                )
+            else:
+                scripted_seconds += speaker_seconds
+                pace = speaker_config.get("pace_units_per_minute")
+                if notes_text and isinstance(pace, int):
+                    expected_units = speaker_seconds * pace / 60
+                    actual_units = speech_units(notes_text)
+                    if actual_units < expected_units * 0.55:
+                        reporter.warn(
+                            f"{path}.speaker_notes",
+                            "is sparse for the allocated speaking time; write a real verbatim script",
+                        )
+                    elif actual_units > expected_units * 1.55:
+                        reporter.warn(
+                            f"{path}.speaker_notes",
+                            "is dense for the allocated speaking time; shorten or increase speaker_seconds",
+                        )
+        elif notes_text and not isinstance(speaker_seconds, int):
+            reporter.warn(
+                f"{path}.speaker_seconds", "add a time budget when a speaker script is present"
+            )
+
         section_id = slide.get("section_id")
         if slide_type == "section_divider":
             if section_id not in SECTION_ORDER:
@@ -350,11 +427,9 @@ def validate(plan: Any, stage: str, plan_path: Path, reporter: Reporter) -> None
                     f"content appears under '{current_section}', not '{section_id}'",
                 )
 
-        for key in ("purpose", "takeaway", "speaker_notes"):
+        for key in ("purpose", "takeaway"):
             if not get_str(slide, key):
                 reporter.error(f"{path}.{key}", "must be non-empty")
-        if 0 < len(get_str(slide, "speaker_notes")) < 30:
-            reporter.warn(f"{path}.speaker_notes", "is very short for a content slide")
 
         layout = slide.get("layout")
         if layout not in LAYOUTS:
@@ -521,10 +596,10 @@ def validate(plan: Any, stage: str, plan_path: Path, reporter: Reporter) -> None
             reporter.error(f"{path}.visual.qa_status", "invalid QA status")
         if stage == "assembly" and qa_status not in {"ready", "approved"}:
             reporter.error(f"{path}.visual.qa_status", "must be ready or approved for assembly")
-        if stage == "final" and qa_status != "approved":
+        if stage in {"notes", "final"} and qa_status != "approved":
             reporter.error(f"{path}.visual.qa_status", "must be approved for final delivery")
 
-        if stage in {"assembly", "final"} and mode != "none":
+        if stage in {"assembly", "notes", "final"} and mode != "none":
             asset_ref = get_str(visual, "asset_ref")
             if asset_ref and not path_from(base, asset_ref).is_file():
                 reporter.error(f"{path}.visual.asset_ref", f"file does not exist: {asset_ref}")
@@ -559,7 +634,7 @@ def validate(plan: Any, stage: str, plan_path: Path, reporter: Reporter) -> None
         review = slide.get("review")
         if not isinstance(review, dict):
             reporter.error(f"{path}.review", "must be an object")
-        elif stage == "final":
+        elif stage in {"notes", "final"}:
             if review.get("content_approved") is not True:
                 reporter.error(f"{path}.review.content_approved", "must be true")
             if review.get("visual_approved") is not True:
@@ -588,7 +663,55 @@ def validate(plan: Any, stage: str, plan_path: Path, reporter: Reporter) -> None
             f"{none_count}/{content_count} content slides use no visual; maximum is {allowed_none}",
         )
 
-    if stage == "final":
+    if notes_enabled and stage in {"notes", "final"}:
+        target_seconds = speaker_config.get("target_minutes", 0) * 60
+        if target_seconds and not target_seconds * 0.85 <= scripted_seconds <= target_seconds * 1.15:
+            reporter.error(
+                "$.slides",
+                f"speaker scripts total {scripted_seconds / 60:.1f} minutes; "
+                f"target {target_seconds / 60:.1f} minutes with a +/-15% tolerance",
+            )
+
+    if notes_enabled and stage == "final":
+        output_value = get_str(project, "output_pptx")
+        if output_value:
+            output_path = path_from(base, output_value)
+            report_value = get_str(project, "speaker_notes_report")
+            report_path = (
+                path_from(base, report_value)
+                if report_value
+                else output_path.with_suffix(".notes.json")
+            )
+            if not report_path.is_file():
+                reporter.error(
+                    "$.project.speaker_notes_report",
+                    f"post-QA notes report does not exist: {report_path}",
+                )
+            elif output_path.is_file():
+                try:
+                    report = json.loads(report_path.read_text(encoding="utf-8"))
+                    if report.get("slides") != len(slides):
+                        reporter.error(
+                            "$.project.speaker_notes_report",
+                            "report slide count does not match the plan",
+                        )
+                    if report.get("scripted_seconds") != scripted_seconds:
+                        reporter.error(
+                            "$.project.speaker_notes_report",
+                            "report timing does not match the plan",
+                        )
+                    if report.get("after_sha256") != sha256_file(output_path):
+                        reporter.error(
+                            "$.project.speaker_notes_report",
+                            "PPTX changed after notes were applied",
+                        )
+                except (OSError, json.JSONDecodeError, AttributeError) as exc:
+                    reporter.error(
+                        "$.project.speaker_notes_report",
+                        f"cannot inspect notes report: {exc}",
+                    )
+
+    if stage in {"notes", "final"}:
         output = get_str(project, "output_pptx")
         if not output:
             reporter.error("$.project.output_pptx", "must be a non-empty path")
@@ -600,7 +723,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("plan", type=Path, help="path to deck-plan.json")
     parser.add_argument(
-        "--stage", choices=("plan", "assembly", "final"), default="plan"
+        "--stage", choices=("plan", "assembly", "notes", "final"), default="plan"
     )
     parser.add_argument("--warnings-as-errors", action="store_true")
     args = parser.parse_args()

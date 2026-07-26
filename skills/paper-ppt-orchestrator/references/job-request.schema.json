@@ -1,0 +1,222 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:paper-ppt-orchestrator:schema:job-request:0.1",
+  "title": "Paper2Seminar job request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "job",
+    "interaction",
+    "input",
+    "presentation",
+    "extraction",
+    "visuals",
+    "features",
+    "execution",
+    "extensions"
+  ],
+  "properties": {
+    "schema_version": {"const": "0.1"},
+    "job": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "created_at", "profile"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{2,127}$"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "profile": {"type": "string", "pattern": "^[a-z][a-z0-9_-]*$"}
+      }
+    },
+    "interaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "mode", "confirmed", "confirmed_at", "review_checkpoints"],
+      "properties": {
+        "source": {"enum": ["web_ui", "skill_chat", "cli"]},
+        "mode": {"enum": ["non_interactive", "confirm_once", "guided"]},
+        "confirmed": {"type": "boolean"},
+        "confirmed_at": {"type": ["string", "null"], "format": "date-time"},
+        "review_checkpoints": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"enum": ["intake", "plan", "assets", "slides", "final"]}
+        }
+      }
+    },
+    "input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paper", "template"],
+      "properties": {
+        "paper": {"$ref": "#/$defs/paper_input"},
+        "template": {"$ref": "#/$defs/template_input"}
+      }
+    },
+    "presentation": {"$ref": "#/$defs/presentation"},
+    "extraction": {"$ref": "#/$defs/extraction"},
+    "visuals": {"$ref": "#/$defs/visuals"},
+    "features": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {"pattern": "^[a-z][a-z0-9_]*$"},
+      "additionalProperties": {"$ref": "#/$defs/feature"},
+      "properties": {
+        "speaker_notes": {"$ref": "#/$defs/speaker_notes_feature"},
+        "readability": {"$ref": "#/$defs/readability_feature"}
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["agent_adapter", "state", "paths"],
+      "properties": {
+        "agent_adapter": {"type": "string", "pattern": "^[a-z][a-z0-9_-]*$"},
+        "state": {"enum": ["pending", "running", "completed", "failed", "cancelled"]},
+        "paths": {"$ref": "#/$defs/paths"}
+      }
+    },
+    "extensions": {
+      "type": "object",
+      "propertyNames": {"pattern": "^[a-z][a-z0-9]*(?:[._-][a-z0-9]+)+$"},
+      "additionalProperties": {"type": "object"}
+    }
+  },
+  "$defs": {
+    "paper_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "original_filename",
+        "sha256",
+        "page_count",
+        "text_extractable",
+        "detected_title",
+        "confirmed_title",
+        "title_cn",
+        "title_confirmed"
+      ],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "original_filename": {"type": "string", "minLength": 1},
+        "sha256": {"type": "string", "pattern": "^[A-Fa-f0-9]{64}$"},
+        "page_count": {"type": "integer", "minimum": 1},
+        "text_extractable": {"type": "boolean"},
+        "detected_title": {"type": "string", "minLength": 1},
+        "confirmed_title": {"type": "string", "minLength": 1},
+        "title_cn": {"type": "string"},
+        "title_confirmed": {"type": "boolean"}
+      }
+    },
+    "template_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "source", "sha256"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "source": {"enum": ["bundled", "uploaded", "custom"]},
+        "sha256": {"type": "string", "pattern": "^[A-Fa-f0-9]{64}$"}
+      }
+    },
+    "presentation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["language", "target_minutes", "slide_count_mode", "target_slide_count", "presenter", "advisor"],
+      "properties": {
+        "language": {"enum": ["zh-CN", "en-US", "bilingual"]},
+        "target_minutes": {"type": "integer", "minimum": 5, "maximum": 120},
+        "slide_count_mode": {"enum": ["auto", "manual"]},
+        "target_slide_count": {"type": ["integer", "null"], "minimum": 8, "maximum": 80},
+        "presenter": {"type": "string", "maxLength": 120},
+        "advisor": {"type": "string", "maxLength": 120}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"slide_count_mode": {"const": "manual"}}, "required": ["slide_count_mode"]},
+          "then": {"properties": {"target_slide_count": {"type": "integer"}}}
+        }
+      ]
+    },
+    "extraction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["backend", "device", "confidence", "crop_dpi", "captioncrop_command"],
+      "properties": {
+        "backend": {"enum": ["doclayout", "captioncrop"]},
+        "device": {"type": "string", "minLength": 1},
+        "confidence": {"type": "number", "minimum": 0.01, "maximum": 1.0},
+        "crop_dpi": {"type": "integer", "minimum": 150, "maximum": 600},
+        "captioncrop_command": {"type": "string"}
+      }
+    },
+    "visuals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["imagegen", "web_search"],
+      "properties": {
+        "imagegen": {"enum": ["available", "unavailable", "unknown"]},
+        "web_search": {"enum": ["available", "unavailable", "unknown"]}
+      }
+    },
+    "feature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "status", "config"],
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "status": {"enum": ["available", "reserved"]},
+        "config": {"type": "object"}
+      }
+    },
+    "speaker_notes_feature": {
+      "allOf": [
+        {"$ref": "#/$defs/feature"},
+        {
+          "properties": {
+            "config": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["generation_stage", "delivery_style", "target_minutes", "pace_units_per_minute"],
+              "properties": {
+                "generation_stage": {"const": "post_qa"},
+                "delivery_style": {"enum": ["verbatim"]},
+                "target_minutes": {"type": "integer", "minimum": 5, "maximum": 120},
+                "pace_units_per_minute": {"type": "integer", "minimum": 80, "maximum": 400}
+              }
+            }
+          }
+        }
+      ]
+    },
+    "readability_feature": {
+      "allOf": [
+        {"$ref": "#/$defs/feature"},
+        {
+          "properties": {
+            "config": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["mode", "group_size"],
+              "properties": {
+                "mode": {"enum": ["off", "overview", "full"]},
+                "group_size": {"type": "integer", "minimum": 1, "maximum": 4}
+              }
+            }
+          }
+        }
+      ]
+    },
+    "paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["job_dir", "deck_plan", "output_pptx", "capabilities"],
+      "properties": {
+        "job_dir": {"type": "string", "minLength": 1},
+        "deck_plan": {"type": "string", "minLength": 1},
+        "output_pptx": {"type": "string", "minLength": 1},
+        "capabilities": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

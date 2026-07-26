@@ -83,7 +83,12 @@ def main() -> int:
 
     validate = subparsers.add_parser("validate", help="validate deck-plan.json")
     validate.add_argument("plan", type=Path)
-    validate.add_argument("--stage", choices=("plan", "assembly", "final"), default="plan")
+    validate.add_argument("--stage", choices=("plan", "assembly", "notes", "final"), default="plan")
+
+    job_request = subparsers.add_parser(
+        "job-request", help="compile or validate a provider-neutral job request"
+    )
+    job_request.add_argument("job_request_args", nargs=argparse.REMAINDER)
 
     preflight = subparsers.add_parser("preflight", help="record host and agent-visible capabilities")
     preflight.add_argument("-o", "--output", type=Path)
@@ -146,6 +151,12 @@ def main() -> int:
     build.add_argument("plan", type=Path)
     build.add_argument("-o", "--output", type=Path)
 
+    notes = subparsers.add_parser(
+        "apply-notes", help="apply post-QA per-slide speaker scripts to an existing PPTX"
+    )
+    notes.add_argument("plan", type=Path)
+    notes.add_argument("--pptx", type=Path)
+
     for qa_action in ("approve-assets", "approve-slides"):
         qa = subparsers.add_parser(qa_action, help=f"apply audited {qa_action} QA transition")
         qa.add_argument("plan", type=Path)
@@ -193,6 +204,16 @@ def main() -> int:
                 str(args.plan.resolve()),
                 "--stage",
                 args.stage,
+            ]
+        )
+    elif args.command == "job-request":
+        if not args.job_request_args:
+            raise SystemExit("job-request requires: defaults, init, brief, confirm, or validate")
+        run(
+            [
+                sys.executable,
+                str(SCRIPT_DIR / "job_request.py"),
+                *args.job_request_args,
             ]
         )
     elif args.command == "preflight":
@@ -303,6 +324,15 @@ def main() -> int:
         command = [sys.executable, str(SCRIPT_DIR / "build_ppt.py"), str(args.plan.resolve())]
         if args.output:
             command += ["-o", str(args.output.resolve())]
+        run(command)
+    elif args.command == "apply-notes":
+        command = [
+            sys.executable,
+            str(SCRIPT_DIR / "apply_speaker_notes.py"),
+            str(args.plan.resolve()),
+        ]
+        if args.pptx:
+            command += ["--pptx", str(args.pptx.resolve())]
         run(command)
     elif args.command in {"approve-assets", "approve-slides"}:
         command = [

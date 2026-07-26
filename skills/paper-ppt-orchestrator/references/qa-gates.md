@@ -184,25 +184,36 @@ slide 14: TikZ feedback arrow overlaps the result node
 
 Only rerender when the overview reveals an obvious failure. Do not run an automatic multi-cycle visual loop by default.
 
-## Gate 5: final content review
+## Gate 5: final core content review
 
 - Open the deck in the presentation viewer used for the talk.
-- Confirm charts, fonts, transitions, notes, and page numbers.
+- Confirm charts, fonts, transitions, and page numbers.
 - Read all titles in order.
 - Spot-check every numerical claim against the paper.
 - Confirm discussion and limitation statements are correctly attributed.
 - Confirm the deck fits the target talk duration.
 
-Record approvals through the transition command, then run:
+Record approvals through the transition command. When speaker notes are disabled, proceed directly to final validation. When they are enabled, complete Gate 6 first.
 
 ```powershell
 python scripts/paper_ppt.py approve-slides deck-plan.json --all-content `
   --note "final review complete"
 ```
 
-When `project.final_readability_mode` is `overview` or `full`, the command and final validator require the matching readability manifest and evidence files. Then run:
+When `project.final_readability_mode` is `overview` or `full`, the command and final validator require the matching readability manifest and evidence files.
+
+## Gate 6: post-QA speaker script
+
+- Every slide has a natural verbatim `speaker_notes` script and a `speaker_seconds` budget.
+- Total scripted time is within 15% of `project.speaker_notes.target_minutes`.
+- The script was written from structured slide text, visual metadata, paper notes, evidence, and paper text, never from slide screenshots.
+- Numerical claims retain their metric, unit, baseline, condition, and attribution.
+- Fixed-role and section-divider scripts remain concise and provide useful transitions.
+
+Apply notes to the already-approved deck, then run:
 
 ```powershell
+python scripts/paper_ppt.py apply-notes deck-plan.json
 python scripts/validate_deck_plan.py deck-plan.json --stage final
 ```
 

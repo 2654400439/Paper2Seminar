@@ -1,5 +1,6 @@
 # Optional default figure/table extraction backend. These are the versions
 # verified by the project; use the matching PyTorch index when required.
+-r requirements.txt
 doclayout-yolo==0.0.4
 torch==2.8.0
 torchvision==0.23.0

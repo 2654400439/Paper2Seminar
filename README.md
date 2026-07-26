@@ -118,6 +118,7 @@ paper.pdf
   -> 独立审核视觉资产
   -> 确定性组装可编辑 PPTX
   -> 结构 + 内容 + 视觉 QA
+  -> 后置生成并写入逐页逐字稿
 ```
 
 </details>
@@ -155,6 +156,7 @@ paper.pdf
 - 一份完整的中文讨论班 PPT，并保留必要的英文技术术语。
 - 一份由 OfficeCLI 从固定模板组装的可编辑 `.pptx`。
 - 包含逐页正文、视觉决策、讲稿和审核状态的 `deck-plan.json`。
+- 核心页面审批后生成并写入每一页备注的约 30 分钟逐字稿。
 - 论文裁剪图、手动裁剪来源、TikZ 源文件、数据重绘规格和运行 manifest。
 - 一张通过浏览器渲染的论文一页纸总结。
 - 可选的全局总览图或分组可读性检查图。
@@ -174,6 +176,17 @@ Codex 可以显式调用：
 ```text
 请使用 $paper-ppt-orchestrator，将 ./paper.pdf 制作成完整可交付的中文讨论班 PPT。
 ```
+
+也可以启动本地任务控制台，上传论文并配置模板、汇报人、时长、图表裁剪、质量检查和逐页讲稿：
+
+```text
+python -m pip install -r requirements-ui.txt
+streamlit run skills/paper-ppt-orchestrator/webapp/streamlit_app.py
+```
+
+当前 UI 使用本机已安装并登录的 Codex CLI 执行完整 Agent Skill 工作流。任务、日志和产物保存在独立的 `runs/ui-*` 目录；具体接口边界见 [Web UI 说明](docs/web-ui.md)。
+
+UI、对话式 Skill 和 CLI 共用同一个版本化 `job-request.json` 契约及同一组默认 profile。UI 已确认的字段不会被 agent 重复询问；普通 Skill 调用默认只做一次集中确认。配置扩展规则、交互模式和命令示例见 [任务配置契约](docs/job-request.md)。
 
 Codex 和 OpenCode 可通过 `.agents/skills/paper-ppt-orchestrator` 自动发现，Claude Code 可通过 `.claude/skills/paper-ppt-orchestrator` 自动发现。
 
@@ -250,6 +263,7 @@ python skills/paper-ppt-orchestrator/scripts/paper_ppt.py preflight -o runs/demo
 - 项目提供可靠的首轮交付物，不承诺无人监督的最终真理。
 - 语义准确性仍取决于模型是否正确理解论文以及最终人工审核。
 - 当前正文布局有意保持固定和克制，而不是追求无限主题和版式变化。
+- Web UI 当前只实现 Codex CLI 执行适配；其他 agent、增量重建、多版式和证据脚注仍为预留项。
 - 随附模板保留现有国科大视觉标识和默认汇报人/指导老师姓名，需要时可在幻灯片母版、封面和结束页中替换。
 - 论文 PDF 和 `runs/` 不进入版本控制；只有经过验证并附带第三方内容说明的展示样例保存在 `examples/` 中。
 
@@ -277,6 +291,7 @@ python -m pip install -r requirements.txt
 # 可选：真实模型抽取测试与使用
 python -m pip install -r requirements-doclayout.txt
 python -m unittest discover -s tests -v
+python skills/paper-ppt-orchestrator/scripts/paper_ppt.py job-request validate examples/job-request.example.json
 python skills/paper-ppt-orchestrator/scripts/validate_deck_plan.py examples/deck-plan.example.json --stage plan
 ```
 

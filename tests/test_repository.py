@@ -75,6 +75,37 @@ class RepositoryTests(unittest.TestCase):
         self.assertIn("torchvision==0.23.0", requirements)
         self.assertEqual(list(SKILL_ROOT.rglob("*.pt")), [])
 
+    def test_standalone_skill_has_complete_dependency_entry_points(self) -> None:
+        core = SKILL_ROOT / "requirements.txt"
+        ui = SKILL_ROOT / "requirements-ui.txt"
+        doclayout = SKILL_ROOT / "requirements-doclayout.txt"
+        self.assertTrue(core.is_file())
+        self.assertTrue(ui.is_file())
+        self.assertTrue(doclayout.is_file())
+        core_text = core.read_text(encoding="utf-8")
+        for dependency in ("matplotlib", "Pillow", "jsonschema", "PyMuPDF"):
+            self.assertIn(dependency, core_text)
+        self.assertIn("-r requirements.txt", ui.read_text(encoding="utf-8"))
+        self.assertIn("streamlit", ui.read_text(encoding="utf-8"))
+        self.assertIn("-r requirements.txt", doclayout.read_text(encoding="utf-8"))
+
+    def test_job_request_contract_is_bundled_with_the_skill(self) -> None:
+        for name in (
+            "job-request.schema.json",
+            "job-request.defaults.json",
+            "feature-registry.json",
+        ):
+            with self.subTest(name=name):
+                self.assertTrue((SKILL_ROOT / "references" / name).is_file())
+        self.assertTrue((SKILL_ROOT / "scripts" / "job_request.py").is_file())
+        self.assertTrue((ROOT / "examples" / "job-request.example.json").is_file())
+
+    def test_core_builder_defers_speaker_notes_to_post_qa_stage(self) -> None:
+        builder = (SKILL_ROOT / "scripts" / "build_ppt.py").read_text(encoding="utf-8")
+        self.assertNotIn("set_notes(pptx, slide_number", builder)
+        self.assertTrue((SKILL_ROOT / "scripts" / "apply_speaker_notes.py").is_file())
+        self.assertTrue((SKILL_ROOT / "references" / "speaker-notes.md").is_file())
+
     def test_readme_workflow_animations_are_complete_and_bounded(self) -> None:
         self.assertTrue((ROOT / "docs" / "render_workflow_animation.py").is_file())
         for name in ("workflow-pipeline.zh-CN.gif", "workflow-pipeline.en.gif"):

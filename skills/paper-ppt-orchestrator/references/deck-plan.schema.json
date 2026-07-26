@@ -24,6 +24,8 @@
         "target_slide_count": {"type": "integer", "minimum": 8, "maximum": 80},
         "final_readability_mode": {"enum": ["off", "overview", "full"], "default": "off"},
         "readability_manifest": {"type": "string", "minLength": 1},
+        "speaker_notes": {"$ref": "#/$defs/speaker_notes_config"},
+        "speaker_notes_report": {"type": "string", "minLength": 1},
         "supported_layouts": {
           "type": "array",
           "minItems": 1,
@@ -76,6 +78,18 @@
     }
   },
   "$defs": {
+    "speaker_notes_config": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "generation_stage", "delivery_style", "target_minutes", "pace_units_per_minute"],
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "generation_stage": {"const": "post_qa"},
+        "delivery_style": {"enum": ["verbatim"]},
+        "target_minutes": {"type": "integer", "minimum": 5, "maximum": 120},
+        "pace_units_per_minute": {"type": "integer", "minimum": 80, "maximum": 400}
+      }
+    },
     "evidence": {
       "type": "object",
       "additionalProperties": false,
@@ -193,12 +207,13 @@
         "body": {"type": "array", "minItems": 2, "maxItems": 5, "items": {"$ref": "#/$defs/body_point"}},
         "visual": {"$ref": "#/$defs/visual"},
         "speaker_notes": {"type": "string"},
+        "speaker_seconds": {"type": "integer", "minimum": 5, "maximum": 600},
         "review": {"$ref": "#/$defs/review"}
       },
       "allOf": [
         {
           "if": {"properties": {"type": {"const": "content"}}, "required": ["type"]},
-          "then": {"required": ["section_id", "purpose", "takeaway", "layout", "body", "visual", "speaker_notes", "review"]}
+          "then": {"required": ["section_id", "purpose", "takeaway", "layout", "body", "visual", "review"]}
         },
         {
           "if": {"properties": {"type": {"const": "section_divider"}}, "required": ["type"]},

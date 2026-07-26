@@ -1,0 +1,67 @@
+{
+  "schema_version": "0.1",
+  "default_profile": "seminar_30_zh",
+  "profiles": {
+    "seminar_30_zh": {
+      "presentation": {
+        "language": "zh-CN",
+        "target_minutes": 30,
+        "slide_count_mode": "auto",
+        "target_slide_count": null,
+        "presenter": "",
+        "advisor": ""
+      },
+      "extraction": {
+        "backend": "doclayout",
+        "device": "cpu",
+        "confidence": 0.18,
+        "crop_dpi": 300,
+        "captioncrop_command": ""
+      },
+      "visuals": {
+        "imagegen": "unknown",
+        "web_search": "unknown"
+      },
+      "features": {
+        "speaker_notes": {
+          "enabled": true,
+          "status": "available",
+          "config": {
+            "generation_stage": "post_qa",
+            "delivery_style": "verbatim",
+            "target_minutes": 30,
+            "pace_units_per_minute": 220
+          }
+        },
+        "readability": {
+          "enabled": true,
+          "status": "available",
+          "config": {
+            "mode": "overview",
+            "group_size": 4
+          }
+        },
+        "layout_selection": {
+          "enabled": false,
+          "status": "reserved",
+          "config": {}
+        },
+        "evidence_footers": {
+          "enabled": false,
+          "status": "reserved",
+          "config": {}
+        },
+        "incremental_rebuild": {
+          "enabled": false,
+          "status": "reserved",
+          "config": {}
+        },
+        "template_adaptation": {
+          "enabled": false,
+          "status": "reserved",
+          "config": {}
+        }
+      }
+    }
+  }
+}

@@ -6,6 +6,7 @@ Treat each stage output as immutable input to the next stage. When upstream cont
 
 ```text
 paper PDF + template + user brief
+  -> validated and confirmed job-request.json
   -> run-manifest.json
   -> paper-notes.json + subsection coverage matrix + figure inventory
   -> title sequence
@@ -13,10 +14,16 @@ paper PDF + template + user brief
   -> filled fixed one-page HTML + PNG
   -> approved visual assets
   -> presentation.pptx
-  -> rendered slides + qa/report.md
+  -> rendered slides + core slide approval
+  -> post-QA speaker script + presentation.notes.json
+  -> qa/report.md
 ```
 
 ## Stage 0: run manifest and preflight
+
+Compile task choices through the shared job-request contract. A confirmed UI or non-interactive request proceeds directly. A normal conversational Skill request uses `confirm_once`: inspect only the title, PDF text availability, template, and capabilities; print the execution brief; wait once; then record confirmation. Use `guided` only when explicitly requested.
+
+Do not start full-paper reading, model extraction, or asset generation from an unconfirmed request. Do not repeat questions already confirmed by the Web UI.
 
 Create one run directory per paper. Record:
 
@@ -159,7 +166,7 @@ closing
 
 Clone the correct section-specific content slide for every added content page. Update the presentation slide list instead of overwriting subsequent template slides.
 
-Add speaking context to speaker notes and alt text to every inserted picture. Formal source anchors are optional in P0.
+Add alt text to every inserted picture. Formal source anchors are optional in P0. Do not write or insert the verbatim speaker script during assembly.
 
 ## Stage 5: QA and final approval
 
@@ -185,4 +192,8 @@ python scripts/paper_ppt.py approve-slides deck-plan.json --all-content `
   --note "final review complete"
 ```
 
-Preserve the plan, `qa/approval-log.jsonl`, and QA report with the deck. They are part of the deliverable, not temporary build files.
+## Stage 6: post-QA speaker script
+
+When enabled, read `speaker-notes.md` after slide approval. Draft `speaker_notes` and `speaker_seconds` for every plan entry from the paper text, paper notes, evidence, slide copy, and visual metadata. Do not use rendered screenshots as a semantic source. Run `paper_ppt.py apply-notes deck-plan.json`, then final validation.
+
+Preserve the plan, `qa/approval-log.jsonl`, `presentation.notes.json`, and QA report with the deck. They are part of the deliverable, not temporary build files.

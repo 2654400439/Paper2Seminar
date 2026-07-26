@@ -155,7 +155,12 @@ class DocLayoutPredictor:
     ) -> None:
         self.model_sha256 = verify_model(model_path, allow_unverified=allow_unverified_model)
         self.config = config
-        yolo_config = (cache_dir or default_cache_dir()) / "yolo-config"
+        configured_yolo = os.environ.get("YOLO_CONFIG_DIR")
+        yolo_config = (
+            Path(configured_yolo).expanduser()
+            if configured_yolo
+            else (cache_dir or default_cache_dir()) / "yolo-config"
+        )
         yolo_config.mkdir(parents=True, exist_ok=True)
         os.environ.setdefault("YOLO_CONFIG_DIR", str(yolo_config.resolve()))
         try:

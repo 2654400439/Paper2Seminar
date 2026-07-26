@@ -10,7 +10,7 @@ Choose the visual after the slide purpose and evidence are fixed.
 4. Is the slide conceptual background where a realistic visual improves orientation without carrying factual detail? Use `imagegen` when capability preflight marks it available. Otherwise, if licensed web-image search is available, use `external_image`.
 5. Is the slide a reflection, limitation, discussion, quote, or question that is clearer without a main image? Use `none`.
 
-For a complete deck, satisfy a small diversity floor across the deck: at least one conceptual visual (`imagegen`, or `external_image` only when the capability report selects the fallback), one `tikz` visual, and one faithful `data_redraw` visual. Meet this requirement during visual routing by choosing semantically appropriate slides. Do not force a mode onto an unsuitable slide or weaken evidence fidelity. P0 records this as a planning constraint and does not add a separate counting-only gate.
+For a complete deck, satisfy a capability-aware diversity floor: one `tikz` visual, one faithful `data_redraw` visual, and at least one conceptual visual only when preflight selects `imagegen` or `external_image`. When preflight selects `tikz_or_none`, preserve that capability waiver and do not block delivery or invent an unavailable asset. Meet the applicable requirement during visual routing by choosing semantically appropriate slides. Do not force a mode onto an unsuitable slide or weaken evidence fidelity. P0 records this as a planning constraint and does not add a separate counting-only gate.
 
 ## `paper_asset`
 

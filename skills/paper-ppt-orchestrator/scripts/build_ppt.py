@@ -317,15 +317,6 @@ def fill_contributions(pptx: Path, shape_path: str, contributions: list[dict[str
                 office(pptx, ["set", paragraph_path, "--find", str(run["text"]), "--prop", "bold=true"])
 
 
-def set_notes(pptx: Path, slide_number: int, text: str) -> None:
-    path = f"/slide[{slide_number}]/notes"
-    existing = office(pptx, ["get", path], check=False)
-    if existing.returncode == 0:
-        office(pptx, ["set", path, "--prop", f"text={text}"])
-    else:
-        office(pptx, ["add", f"/slide[{slide_number}]", "--type", "notes", "--prop", f"text={text}"])
-
-
 def fill_content_slide(
     pptx: Path,
     slide_number: int,
@@ -355,8 +346,6 @@ def fill_content_slide(
         ],
     )
     style_body_runs(pptx, body_shape["path"], body_points)
-    set_notes(pptx, slide_number, slide["speaker_notes"])
-
     visual = slide["visual"]
     if visual["mode"] == "none":
         office(pptx, ["remove", visual_shape["path"]])

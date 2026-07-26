@@ -1,4 +1,1 @@
-matplotlib>=3.8,<4
-Pillow>=10,<13
-jsonschema>=4,<5
-PyMuPDF>=1.24,<2
+-r skills/paper-ppt-orchestrator/requirements.txt

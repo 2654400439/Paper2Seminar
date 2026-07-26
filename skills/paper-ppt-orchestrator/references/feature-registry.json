@@ -1,0 +1,53 @@
+{
+  "schema_version": "0.1",
+  "features": {
+    "speaker_notes": {
+      "status": "available",
+      "stage": "post_qa",
+      "default_enabled": true,
+      "ui_control": "custom",
+      "label_zh": "逐页讲稿",
+      "label_en": "Per-slide speaker script"
+    },
+    "readability": {
+      "status": "available",
+      "stage": "qa",
+      "default_enabled": true,
+      "ui_control": "custom",
+      "label_zh": "最终可读性检查",
+      "label_en": "Final readability review"
+    },
+    "layout_selection": {
+      "status": "reserved",
+      "stage": "planning",
+      "default_enabled": false,
+      "ui_control": "toggle",
+      "label_zh": "多版式自动选择",
+      "label_en": "Automatic multi-layout selection"
+    },
+    "evidence_footers": {
+      "status": "reserved",
+      "stage": "assembly",
+      "default_enabled": false,
+      "ui_control": "toggle",
+      "label_zh": "页面内证据脚注",
+      "label_en": "On-slide evidence footers"
+    },
+    "incremental_rebuild": {
+      "status": "reserved",
+      "stage": "execution",
+      "default_enabled": false,
+      "ui_control": "toggle",
+      "label_zh": "增量重建",
+      "label_en": "Incremental rebuild"
+    },
+    "template_adaptation": {
+      "status": "reserved",
+      "stage": "preflight",
+      "default_enabled": false,
+      "ui_control": "toggle",
+      "label_zh": "多模板自动适配",
+      "label_en": "Generic template adaptation"
+    }
+  }
+}

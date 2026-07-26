@@ -67,7 +67,7 @@ For the current template:
 - Do not color whole bullets, routine connective text, citations, or decorative words. Contributions on the paper-information slide remain black with selective bold only.
 - Keep citations and detailed qualifications in speaker notes when the slide would become crowded.
 
-The body is not a transcript. Add speaker notes that explain transitions, caveats, and evidence.
+The body is not a transcript. Do not draft the verbatim script while designing slide copy. Add it only in the post-QA stage defined by `speaker-notes.md`, using the approved plan, visual metadata, paper notes, evidence records, and paper text.
 
 ## Paper-information contributions
 

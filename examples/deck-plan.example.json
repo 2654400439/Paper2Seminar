@@ -12,6 +12,13 @@
     "target_minutes": 15,
     "target_slide_count": 14,
     "final_readability_mode": "off",
+    "speaker_notes": {
+      "enabled": true,
+      "generation_stage": "post_qa",
+      "delivery_style": "verbatim",
+      "target_minutes": 15,
+      "pace_units_per_minute": 220
+    },
     "supported_layouts": ["content_stacked"]
   },
   "paper": {
@@ -166,7 +173,6 @@
         "no_text": true,
         "qa_status": "ready"
       },
-      "speaker_notes": "先解释溯源图为什么有价值，再引出日志增长。这里不把概念图当作论文证据，具体数字回到论文第一页。",
       "review": {"content_approved": false, "visual_approved": false}
     },
     {
@@ -210,7 +216,6 @@
         "expected_aspect_ratio": "wide",
         "qa_status": "ready"
       },
-      "speaker_notes": "这一页用于说明重复来自执行实例，而不是简单的完全相同文本，并为下一页的上下文抽象建立动机。",
       "review": {"content_approved": false, "visual_approved": false}
     },
     {"id": "S08", "type": "section_divider", "section_id": "method", "title": "方法设计"},
@@ -255,7 +260,6 @@
         "expected_aspect_ratio": "wide",
         "qa_status": "ready"
       },
-      "speaker_notes": "强调两种结构解决不同信息：来源链和对象访问。图是汇报者综合示意，不是论文原图。",
       "review": {"content_approved": false, "visual_approved": false}
     },
     {"id": "S10", "type": "section_divider", "section_id": "results", "title": "实验结果"},
@@ -301,7 +305,6 @@
         "expected_aspect_ratio": "wide",
         "qa_status": "ready"
       },
-      "speaker_notes": "先读六个数据集的分布，再解释 E5-Trace 的峰值来源。这里的分母是 access network 中的 links，不能把该数值直接解释为所有日志存储场景的固定压缩率。",
       "review": {"content_approved": false, "visual_approved": false}
     },
     {"id": "S12", "type": "section_divider", "section_id": "reflection", "title": "总结思考"},
@@ -345,7 +348,6 @@
         "expected_aspect_ratio": "not_applicable",
         "qa_status": "ready"
       },
-      "speaker_notes": "明确告诉听众这两点是汇报者分析。讨论是否能迁移到网络流、系统调用或遥测数据时，应检查上下文等价关系是否稳定。",
       "review": {"content_approved": false, "visual_approved": false}
     },
     {"id": "S14", "type": "closing", "title": "请各位老师和同学批评指正"}

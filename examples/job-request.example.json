@@ -1,0 +1,103 @@
+{
+  "schema_version": "0.1",
+  "job": {
+    "id": "example-paper-job",
+    "created_at": "2026-07-25T00:00:00+00:00",
+    "profile": "seminar_30_zh"
+  },
+  "interaction": {
+    "source": "skill_chat",
+    "mode": "confirm_once",
+    "confirmed": false,
+    "confirmed_at": null,
+    "review_checkpoints": ["intake", "final"]
+  },
+  "input": {
+    "paper": {
+      "path": "paper.pdf",
+      "original_filename": "paper.pdf",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "page_count": 16,
+      "text_extractable": true,
+      "detected_title": "Example Research Paper",
+      "confirmed_title": "Example Research Paper",
+      "title_cn": "",
+      "title_confirmed": false
+    },
+    "template": {
+      "path": "skills/paper-ppt-orchestrator/assets/seminar-template.pptx",
+      "source": "bundled",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+  },
+  "presentation": {
+    "language": "zh-CN",
+    "target_minutes": 30,
+    "slide_count_mode": "auto",
+    "target_slide_count": null,
+    "presenter": "",
+    "advisor": ""
+  },
+  "extraction": {
+    "backend": "doclayout",
+    "device": "cpu",
+    "confidence": 0.18,
+    "crop_dpi": 300,
+    "captioncrop_command": ""
+  },
+  "visuals": {
+    "imagegen": "unknown",
+    "web_search": "unknown"
+  },
+  "features": {
+    "speaker_notes": {
+      "enabled": true,
+      "status": "available",
+      "config": {
+        "generation_stage": "post_qa",
+        "delivery_style": "verbatim",
+        "target_minutes": 30,
+        "pace_units_per_minute": 220
+      }
+    },
+    "readability": {
+      "enabled": true,
+      "status": "available",
+      "config": {
+        "mode": "overview",
+        "group_size": 4
+      }
+    },
+    "layout_selection": {
+      "enabled": false,
+      "status": "reserved",
+      "config": {}
+    },
+    "evidence_footers": {
+      "enabled": false,
+      "status": "reserved",
+      "config": {}
+    },
+    "incremental_rebuild": {
+      "enabled": false,
+      "status": "reserved",
+      "config": {}
+    },
+    "template_adaptation": {
+      "enabled": false,
+      "status": "reserved",
+      "config": {}
+    }
+  },
+  "execution": {
+    "agent_adapter": "codex",
+    "state": "pending",
+    "paths": {
+      "job_dir": "runs/example-paper-job",
+      "deck_plan": "runs/example-paper-job/deck-plan.json",
+      "output_pptx": "runs/example-paper-job/build/presentation.pptx",
+      "capabilities": "runs/example-paper-job/capabilities.json"
+    }
+  },
+  "extensions": {}
+}

@@ -118,6 +118,7 @@ paper.pdf
   -> reviewed visual assets
   -> deterministic editable PPTX assembly
   -> structural + content + visual QA
+  -> post-QA per-slide verbatim script
 ```
 
 </details>
@@ -155,6 +156,7 @@ paper.pdf
 - A complete Chinese seminar deck with necessary English technical terms.
 - An editable `.pptx`, assembled through OfficeCLI from the bundled template.
 - A structured `deck-plan.json` containing slide copy, visual decisions, notes, and review state.
+- A roughly 30-minute verbatim script generated after core slide approval and written into every slide's notes.
 - Paper crops, manual-crop provenance, TikZ sources, data-redraw specifications, and manifests.
 - A browser-rendered one-page paper summary.
 - Optional overview or grouped readability images for final review.
@@ -174,6 +176,17 @@ For Codex, the explicit form is:
 ```text
 Use $paper-ppt-orchestrator to turn ./paper.pdf into a complete, deliverable Chinese seminar PPT.
 ```
+
+You can also start the local task console to upload a paper and configure the template, presenter, duration, figure extraction, QA, and per-slide script:
+
+```text
+python -m pip install -r requirements-ui.txt
+streamlit run skills/paper-ppt-orchestrator/webapp/streamlit_app.py
+```
+
+The current UI uses an installed and authenticated Codex CLI to run the complete Agent Skill workflow. Each task, log, and artifact is isolated under `runs/ui-*`; see the [Web UI contract](docs/web-ui.md).
+
+The UI, conversational Skill, and CLI share one versioned `job-request.json` contract and the same default profiles. An agent does not repeat fields already confirmed in the UI; a normal conversational invocation uses one consolidated confirmation. See the [job request contract](docs/job-request.md) for extension rules, interaction modes, and command examples.
 
 The repository-local loaders allow Codex and OpenCode to discover `.agents/skills/paper-ppt-orchestrator`, while Claude Code can discover `.claude/skills/paper-ppt-orchestrator`.
 
@@ -250,6 +263,7 @@ See [framework and platform compatibility](docs/compatibility.md) for the exact 
 - The project produces a strong first deliverable, not an unsupervised final truth.
 - Semantic accuracy still depends on the model reading the paper correctly and on human review.
 - The default content layout is intentionally fixed and restrained rather than infinitely themeable.
+- The Web UI currently implements only the Codex CLI execution adapter; other agents, incremental rebuilds, multiple layouts, and evidence footers remain reserved controls.
 - The bundled template retains its current UCAS identity and presenter/advisor defaults; replace them in Slide Master and the cover/closing slides when needed.
 - Source papers and `runs/` are excluded from version control. Only curated, validated demonstration decks and renders are kept under `examples/` with a third-party content notice.
 
@@ -277,6 +291,7 @@ python -m pip install -r requirements.txt
 # Optional real-model extraction tests and use:
 python -m pip install -r requirements-doclayout.txt
 python -m unittest discover -s tests -v
+python skills/paper-ppt-orchestrator/scripts/paper_ppt.py job-request validate examples/job-request.example.json
 python skills/paper-ppt-orchestrator/scripts/validate_deck_plan.py examples/deck-plan.example.json --stage plan
 ```
 
