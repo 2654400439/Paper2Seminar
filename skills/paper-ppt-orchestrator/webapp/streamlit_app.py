@@ -124,7 +124,7 @@ def render_status(job_dir: Path) -> None:
             )
 
 
-st.title("Paper2Seminar")
+st.title("Paper2Seminar（测试版）")
 st.caption("本地论文汇报任务控制台")
 
 with st.sidebar:

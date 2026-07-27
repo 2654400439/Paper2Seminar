@@ -184,6 +184,9 @@ python -m pip install -r requirements-ui.txt
 streamlit run skills/paper-ppt-orchestrator/webapp/streamlit_app.py
 ```
 
+> [!WARNING]
+> **Web UI 目前为测试版，功能尚不稳定，可能出现任务创建失败、状态同步异常等情况。** 推荐优先使用对话式 Skill 调用方式（见上方示例）。生成的 `deck-plan.json` 和中间产物仍可正常使用，只是 UI 层的前后端交互仍在完善中。
+
 当前 UI 使用本机已安装并登录的 Codex CLI 执行完整 Agent Skill 工作流。任务、日志和产物保存在独立的 `runs/ui-*` 目录；具体接口边界见 [Web UI 说明](docs/web-ui.md)。
 
 UI、对话式 Skill 和 CLI 共用同一个版本化 `job-request.json` 契约及同一组默认 profile。UI 已确认的字段不会被 agent 重复询问；普通 Skill 调用默认只做一次集中确认。配置扩展规则、交互模式和命令示例见 [任务配置契约](docs/job-request.md)。

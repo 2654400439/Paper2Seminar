@@ -184,6 +184,9 @@ python -m pip install -r requirements-ui.txt
 streamlit run skills/paper-ppt-orchestrator/webapp/streamlit_app.py
 ```
 
+> [!WARNING]
+> **The Web UI is currently in beta and may be unstable.** You may encounter issues such as task creation failures or status synchronization problems. We recommend using the conversational Skill invocation (see examples above) as the primary method. The generated `deck-plan.json` and intermediate artifacts remain usable; only the UI frontend-backend interaction is still being refined.
+
 The current UI uses an installed and authenticated Codex CLI to run the complete Agent Skill workflow. Each task, log, and artifact is isolated under `runs/ui-*`; see the [Web UI contract](docs/web-ui.md).
 
 The UI, conversational Skill, and CLI share one versioned `job-request.json` contract and the same default profiles. An agent does not repeat fields already confirmed in the UI; a normal conversational invocation uses one consolidated confirmation. See the [job request contract](docs/job-request.md) for extension rules, interaction modes, and command examples.
